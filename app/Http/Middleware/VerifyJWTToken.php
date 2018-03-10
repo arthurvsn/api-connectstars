@@ -15,9 +15,18 @@ class VerifyJWTToken
      */
     public function handle($request, Closure $next)
     {
+        if (isset($_SERVER['HTTP_TOKEN']))
+        {
+            $token = $_SERVER['HTTP_TOKEN'];
+        }
+        else 
+        {
+            $token = $request->input('token');
+        }
+
         try
         {
-            $user = JWTAuth::toUser($_SERVER['HTTP_TOKEN']);
+            $user = JWTAuth::toUser($token);
         }
         catch (JWTException $e)
         {
