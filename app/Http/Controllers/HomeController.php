@@ -19,6 +19,6 @@ class HomeController extends Controller
         $this->response->setTypeS();
         $this->response->setMessages("API connected!");
 
-        return $this->response->toString();
+        return response()->json($this->response->toString());
     }
 }

@@ -19,17 +19,6 @@ class UserController extends Controller
         $this->response = new Response();
     }
 
-    public function register(Request $request)
-    {
-        $user = $this->user->create([
-          'name' => $request->get('name'),
-          'email' => $request->get('email'),
-          'password' => bcrypt($request->get('password'))
-        ]);
-
-        return response()->json(['status'=>true,'message'=>'User created successfully','data'=>$user]);
-    }
-
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
@@ -89,16 +78,27 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+        
         $user = $request->all();
-
         $user['password'] = bcrypt($user['password']);        
-        User::create($user);
+        $returnUser = $this->user->create($user);
 
         $this->response->setTypeS();
-        $this->response->setDataSet($user);
-        $this->response->setMessages("Sucess!");
+        $this->response->setDataSet($returnUser);
+        $this->response->setMessages("Created user successfully!");
         
         return response()->json($this->response->toString());
+    }
+
+    public function register(Request $request)
+    {
+        $user = $this->user->create([
+          'name' => $request->get('name'),
+          'email' => $request->get('email'),
+          'password' => bcrypt($request->get('password'))
+        ]);
+
+        return response()->json(['status'=>true,'message'=>'User created successfully','data'=>$user]);
     }
 
     /**
