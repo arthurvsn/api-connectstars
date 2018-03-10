@@ -12,9 +12,7 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
-Route::get('/', function(){
-    return response()->json(['message' => 'ConnectStars API', 'status' => 'Connected']);;
-});
+Route::get('/', 'HomeController@index');
 
 Route::resource('user', 'UserController');
+

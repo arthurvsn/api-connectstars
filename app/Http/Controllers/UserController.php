@@ -59,7 +59,6 @@ class UserController extends Controller
         $this->response->setMessages("Sucess!");
         
         return response()->json($this->response->toString());
-
     }
 
     /**

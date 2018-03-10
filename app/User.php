@@ -26,4 +26,14 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
     ];
+
+    protected $dateFormat = 'Y-m-d H:i:s';
+    
+    protected $dates = [
+        'start_time',
+        'end_time',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+    ];
 }
