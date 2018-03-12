@@ -3,46 +3,17 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use JWTAuth;
-use App\User;
-use JWTAuthException;
+use App\TypeUser;
 use \App\Response\Response;
 
-class UserController extends Controller
+class TypeUserController extends Controller
 {
     private $response;
-    private $user;
 
-    public function __construct(User $user) 
+    public function __construct() 
     {
-        $this->user = $user;
         $this->response = new Response();
     }
-
-    public function login(Request $request)
-    {
-        $credentials = $request->only('email', 'password');
-        $token = null;
-        try 
-        {
-           if (!$token = JWTAuth::attempt($credentials)) 
-           {
-                return response()->json(['invalid_email_or_password'], 422);
-           }
-        } 
-        catch (JWTAuthException $e) 
-        {
-            return response()->json(['failed_to_create_token'], 500);
-        }
-
-        return response()->json(compact('token'));
-    }
-    public function getAuthUser(Request $request)
-    {
-        $user = JWTAuth::toUser($request->token);
-        return response()->json(['result' => $user]);
-    }
-
     /**
      * Display a listing of the resource.
      *
@@ -50,10 +21,9 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::get();
-
+        $typeUsers = TypeUser::get();
         $this->response->setTypeS();
-        $this->response->setDataSet($users);
+        $this->response->setDataSet($typeUsers);
         $this->response->setMessages("Sucess!");
 
         return response()->json($this->response->toString());
@@ -65,9 +35,7 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create()
-    {
-        //
-    }
+    {    }
 
     /**
      * Store a newly created resource in storage.
@@ -77,27 +45,16 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+        $typeUser = new TypeUser();
         
-        $user = $request->all();
-        $user['password'] = bcrypt($user['password']);        
-        $returnUser = $this->user->create($user);
+        $typeUser->fill($request->all());
+        $typeUser->save();
 
         $this->response->setTypeS();
-        $this->response->setDataSet($returnUser);
-        $this->response->setMessages("Created user successfully!");
+        $this->response->setDataSet($typeUser);
+        $this->response->setMessages("Created type user successfully!");
         
         return response()->json($this->response->toString());
-    }
-
-    public function register(Request $request)
-    {
-        $user = $this->user->create([
-          'name' => $request->get('name'),
-          'email' => $request->get('email'),
-          'password' => bcrypt($request->get('password'))
-        ]);
-
-        return response()->json(['status'=>true,'message'=>'User created successfully','data'=>$user]);
     }
 
     /**
@@ -107,9 +64,23 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id)
-    {
-        //
-    }
+    {  
+        $typeUser = TypeUser::find($id);
+        
+        if(!$typeUser) 
+        {
+            $this->response->setTypeN();
+            $this->response->setMessages("Record not found!");
+
+            return response()->json($this->response->toString(), 404);
+        }
+
+        $this->response->setTypeS();
+        $this->response->setDataSet($typeUser);
+        $this->response->setMessages("Sucess!");
+
+        return response()->json($this->response->toString());
+     }
 
     /**
      * Show the form for editing the specified resource.
@@ -118,9 +89,7 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
-    {
-        //
-    }
+    {    }
 
     /**
      * Update the specified resource in storage.
@@ -130,10 +99,10 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
-    {
-        $user = User::find($id);
+    {  
+         $typeUser = TypeUser::find($id);
         
-        if(!$user) 
+        if(!$typeUser) 
         {
             $this->response->setTypeN();
             $this->response->setMessages("Record not found!");
@@ -142,7 +111,7 @@ class UserController extends Controller
         }
 
         $this->response->setTypeS();
-        $this->response->setDataSet($user);
+        $this->response->setDataSet($typeUser);
         $this->response->setMessages("Sucess!");
 
         return response()->json($this->response->toString());
@@ -155,10 +124,10 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
-    {
-        $user = User::find($id);
+    {  
+        $typeUser = TypeUser::find($id);
 
-        if(!$user) 
+        if(!$typeUser) 
         {
             $this->response->setTypeN();
             $this->response->setMessages("Record not found!");
@@ -166,6 +135,6 @@ class UserController extends Controller
             return response()->json($this->response->toString(), 404);
         }
 
-        $user->delete();
+        $typeUser->delete();
     }
 }
