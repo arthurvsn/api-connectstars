@@ -3,22 +3,28 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use JWTAuth;
 use App\User;
+use JWTAuth;
 use JWTAuthException;
 use \App\Response\Response;
+use \App\Service\UserService;
 
 class UserController extends Controller
 {
     private $response;
     private $user;
+    private $userService;
 
     public function __construct(User $user) 
     {
         $this->user = $user;
         $this->response = new Response();
+        $this->userService = new UserService();
     }
 
+    /**
+     * Metodo de login 
+     */
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
@@ -37,6 +43,10 @@ class UserController extends Controller
 
         return response()->json(compact('token'));
     }
+
+    /**
+     * Metodo que recupera o usuario logado
+     */
     public function getAuthUser(Request $request)
     {
         $user = JWTAuth::toUser($request->token);
@@ -65,9 +75,7 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create()
-    {
-        //
-    }
+    {    }
 
     /**
      * Store a newly created resource in storage.
@@ -77,27 +85,13 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+        $user = $this->userService->create($request);
         
-        $user = $request->all();
-        $user['password'] = bcrypt($user['password']);        
-        $returnUser = $this->user->create($user);
-
         $this->response->setTypeS();
         $this->response->setDataSet($returnUser);
         $this->response->setMessages("Created user successfully!");
         
         return response()->json($this->response->toString());
-    }
-
-    public function register(Request $request)
-    {
-        $user = $this->user->create([
-          'name' => $request->get('name'),
-          'email' => $request->get('email'),
-          'password' => bcrypt($request->get('password'))
-        ]);
-
-        return response()->json(['status'=>true,'message'=>'User created successfully','data'=>$user]);
     }
 
     /**
@@ -108,7 +102,22 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        //
+        $user = $this->user->find($id);
+
+        if(!$user)
+        {
+            $this->response->setTypeN();
+            $this->response->setMessages("User not found!");
+            return response()->json($this->response->toString(), 404);
+        }
+        else 
+        {
+            $this->response->setTypeS();
+            $this->response->setDataSet($user);
+            $this->response->setMessages("Show user successfully!");
+            
+            return response()->json($this->response->toString());
+        }
     }
 
     /**
@@ -118,9 +127,7 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
-    {
-        //
-    }
+    {    }
 
     /**
      * Update the specified resource in storage.
