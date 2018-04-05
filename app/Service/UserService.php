@@ -15,16 +15,24 @@ class UserService extends Service
 
     public function createUser(Request $request)
     {
-        $returnUser = $this->user->create([
-            'username' => $request->get('username'),
-            'name' => $request->get('name'),
-            'name' => $request->get('email'),
-            'name' => $request->get('user_type'),
-            'password' => bcrypt($request->get('password')),
-            'user_type' => $request->get('user_type'),
-        ]);
+        try
+        {
+            $returnUser = $this->user->create([
+                'username' => $request->get('username'),
+                'name' => $request->get('name'),
+                'name' => $request->get('email'),
+                'name' => $request->get('user_type'),
+                'password' => bcrypt($request->get('password')),
+                'user_type' => $request->get('user_type'),
+            ]);
+            
+            return $returnUser;
+        }
+        catch(Exception $e)
+        {
+            return false;
+        }
 
-        return $returnUser;
     }
 }
 ?>

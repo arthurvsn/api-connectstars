@@ -23,34 +23,39 @@ class UserController extends Controller
     }
 
     /**
-     * Metodo de login 
+     * Login user
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
      */
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
+        $credentials = $request->only('username', 'password');
         $token = null;
         try 
         {
            if (!$token = JWTAuth::attempt($credentials)) 
            {
-                return response()->json(['invalid_email_or_password'], 422);
+               $this->response->setType("N");
+               $this->response->setMessages("invalid_username_or_password");
+               return response()->json($this->response->toString(), 422);
            }
         } 
         catch (JWTAuthException $e) 
         {
-            return response()->json(['failed_to_create_token'], 500);
+            $this->response->setType("N");
+            $this->response->setMessages("failed_to_create_token");
+            return response()->json($this->response->toString(), 500);
         }
-
-        return response()->json(compact('token'));
-    }
-
-    /**
-     * Metodo que recupera o usuario logado
-     */
-    public function getAuthUser(Request $request)
-    {
-        $user = JWTAuth::toUser($request->token);
-        return response()->json(['result' => $user]);
+        
+        $user = JWTAuth::toUser($token);
+        
+        $this->response->setType("S");
+        $this->response->setDataSet("token", $token);
+        $this->response->setMessages("Login successfully!");
+        
+        $this->response->setDataSet("name", $user->name);
+        $this->response->setDataSet("user_type", $user->user_type);
+        return response()->json($this->response->toString(), 200);
     }
 
     /**
@@ -62,8 +67,8 @@ class UserController extends Controller
     {
         $users = User::get();
 
-        $this->response->setTypeS();
-        $this->response->setDataSet($users);
+        $this->response->setType("S");
+        $this->response->setDataSet("user", $users);
         $this->response->setMessages("Sucess!");
 
         return response()->json($this->response->toString());
@@ -86,10 +91,17 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $user = $this->userService->create($request);
-        
-        $this->response->setTypeS();
-        $this->response->setDataSet($returnUser);
-        $this->response->setMessages("Created user successfully!");
+        if ($user)
+        {
+            $this->response->setType("S");
+            $this->response->setDataSet("user", $returnUser);            
+            $this->response->setMessages("Created user successfully!");
+        }
+        else 
+        {
+            $this->response->setType("N");
+            $this->response->setMessages("Error to create a user!");
+        }
         
         return response()->json($this->response->toString());
     }
@@ -106,14 +118,14 @@ class UserController extends Controller
 
         if(!$user)
         {
-            $this->response->setTypeN();
+            $this->response->setType("N");
             $this->response->setMessages("User not found!");
             return response()->json($this->response->toString(), 404);
         }
         else 
         {
-            $this->response->setTypeS();
-            $this->response->setDataSet($user);
+            $this->response->setType("S");
+            $this->response->setDataSet("user", $user);
             $this->response->setMessages("Show user successfully!");
             
             return response()->json($this->response->toString());
@@ -142,14 +154,14 @@ class UserController extends Controller
         
         if(!$user) 
         {
-            $this->response->setTypeN();
+            $this->response->setType("N");
             $this->response->setMessages("Record not found!");
 
             return response()->json($this->response->toString(), 404);
         }
 
-        $this->response->setTypeS();
-        $this->response->setDataSet($user);
+        $this->response->setTypeS("S");
+        $this->response->setDataSet("user", $user);
         $this->response->setMessages("Sucess!");
 
         return response()->json($this->response->toString());
@@ -167,7 +179,7 @@ class UserController extends Controller
 
         if(!$user) 
         {
-            $this->response->setTypeN();
+            $this->response->setType("N");
             $this->response->setMessages("Record not found!");
 
             return response()->json($this->response->toString(), 404);
