@@ -7,10 +7,12 @@ class Response
     private $messages;
     private $type;
     private $dataSet;
+
     public function __construct() 
     {  
         $this->dataSet = [];
     }
+
     /**
      * Set for options messages to response object
      * @param string $data message
@@ -19,6 +21,7 @@ class Response
     {
         $this->messages = $message;
     }
+
     /**
      * gGet for options messages to response object
      * @return string $data message
@@ -27,6 +30,7 @@ class Response
     {
         return $this->messages;
     }
+
     /**
      * Method Set for data options with object content
      * @param string $name name to index
@@ -36,6 +40,7 @@ class Response
     {
         $this->dataSet[$name] = $data;
     }
+
     /**
      * Method get for data options with object content
      * @return object $dataSet
@@ -44,6 +49,7 @@ class Response
     {
         return $this->dataSet;
     }
+
     /**
      * Set type message (S or N)
      * @param $type
@@ -52,6 +58,7 @@ class Response
     {
         $this->type = $type;
     }
+
     /**
      * Method get type message
      * @return string $type
@@ -60,6 +67,7 @@ class Response
     {
         return $this->type;
     }
+    
      /**
      * Function to converte a object with options
      * @return object $data

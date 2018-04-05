@@ -20,7 +20,7 @@ Route::post('/login', 'UserController@login');
 
 Route::group(['middleware' => 'jwt.auth'], function () {
     Route::resource('user', 'UserController', ['except' => [
-        'store', 'index',
+        'store',
     ]]);
 
     Route::resource('type-user', 'TypeUserController');
