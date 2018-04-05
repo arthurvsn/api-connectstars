@@ -15,15 +15,12 @@ use Illuminate\Http\Request;
 
 Route::get('/', 'HomeController@index');
 
-//Route::resource('user', 'UserController');
-
 Route::post('/register', 'UserController@store');
 Route::post('/login', 'UserController@login');
 
 Route::group(['middleware' => 'jwt.auth'], function () {
-    Route::get('user', 'UserController@getAuthUser');
     Route::resource('user', 'UserController', ['except' => [
-        'store', 'index',
+        'store',
     ]]);
 
     Route::resource('type-user', 'TypeUserController');

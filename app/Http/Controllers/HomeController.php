@@ -16,8 +16,8 @@ class HomeController extends Controller
 
     public function index()
     {
-        $this->response->setTypeS();
         $this->response->setMessages("API connected!");
+        $this->response->setType("S");
 
         return response()->json($this->response->toString());
     }
