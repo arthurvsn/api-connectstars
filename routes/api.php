@@ -24,8 +24,9 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::resource('user', 'UserController', ['except' => [
         'store',
     ]]);
-
+    
     //routes of events
     Route::resource('event', 'EventController');
+    Route::post('add-artist/event/{event}/artist/{artist}', 'EventController@addArtistToEvent');
 });
 

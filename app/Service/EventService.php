@@ -3,14 +3,17 @@ namespace App\Service;
 
 use Illuminate\Http\Request;
 use App\Event;
+use App\ArtistOnEvent;
 
 class EventService extends Service
 {
     private $event;
+    private $artistOnEvent;
 
     public function __construct() 
     {
         $this->event = new Event();
+        $this->artistOnEvent = new ArtistOnEvent();
     }
 
     public function createEvent(Request $request)
@@ -32,7 +35,24 @@ class EventService extends Service
         {
             return false;
         }
+    }
 
+    public function addArtistOnEvent($eventId, $artistId, Request $request)
+    {
+        try
+        {
+            $returnAdd = $this->artistOnEvent->create([
+                'amount_artist_receive' => $request->get('amount_artist_receive'),
+                'user_id' => $artistId,
+                'event_id' => $eventId
+            ]);
+
+            return $returnAdd;
+        }
+        catch(Exception $e)
+        {
+            return false;
+        }
     }
 }
 ?>

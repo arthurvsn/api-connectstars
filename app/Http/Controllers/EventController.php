@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use JWTAuth;
 use JWTAuthException;
 use \App\Event;
+use \App\ArtistOnEvent;
 use \App\Response\Response;
 use \App\Service\EventService;
 
@@ -14,6 +15,7 @@ class EventController extends Controller
     private $response;
     private $event;
     private $eventService;
+    private $artistOnEvent;
 
     /**
      * Contructor of controller
@@ -23,6 +25,7 @@ class EventController extends Controller
         $this->response = new Response();
         $this->event = new Event();
         $this->eventService = new EventService();
+        $this->artistOnEvent = new ArtistOnEvent();
     }
 
     /**
@@ -166,5 +169,17 @@ class EventController extends Controller
         }
 
         $events->delete();
+    }
+
+    /**
+     * 
+     */
+    public function addArtistToEvent($idEvento, $idArtist, Request $request)
+    {
+        $addArtistToEvent = $this->eventService->addArtistOnEvent($idEvento, $idArtist, $request);
+
+        if(!$addArtistToEvent)
+        {
+        }
     }
 }
