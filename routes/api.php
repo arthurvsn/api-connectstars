@@ -19,6 +19,7 @@ Route::post('/register', 'UserController@store');
 Route::post('/login', 'UserController@login');
 
 Route::group(['middleware' => 'jwt.auth'], function () {
+    
     //routes of users
     Route::resource('user', 'UserController', ['except' => [
         'store',

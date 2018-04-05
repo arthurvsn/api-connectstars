@@ -17,7 +17,7 @@ class UserController extends Controller
 
     public function __construct(User $user) 
     {
-        $this->user = $user;
+        $this->user = new User;
         $this->response = new Response();
         $this->userService = new UserService();
     }
@@ -160,9 +160,11 @@ class UserController extends Controller
             return response()->json($this->response->toString(), 404);
         }
 
+        $user->fill($request->all());
+        $user->save();
         $this->response->setTypeS("S");
         $this->response->setDataSet("user", $user);
-        $this->response->setMessages("Sucess!");
+        $this->response->setMessages("User updated successfully !");
 
         return response()->json($this->response->toString());
     }

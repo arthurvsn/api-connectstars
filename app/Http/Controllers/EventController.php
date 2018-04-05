@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use \App\Event;
 use JWTAuth;
 use JWTAuthException;
+use \App\Event;
 use \App\Response\Response;
 use \App\Service\EventService;
 
@@ -32,7 +32,13 @@ class EventController extends Controller
      */
     public function index()
     {
-        //
+        $events = $this->event->get();
+        
+        $this->response->setType("S");
+        $this->response->setMessages("Sucess");
+        $this->response->setDataSet("events", $events);
+
+        return resonse()->json($this->response->toString());
     }
 
     /**
@@ -51,21 +57,33 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        $returnEvent = $this->eventService->createEvent($request);
+        $user_logged = $this->eventService->getAuthUser($request);
 
-        if(!$event)
+        if($user_logged->type_user == "CONTRACTOR")
+        {
+            $returnEvent = $this->eventService->createEvent($request);
+    
+            if(!$event)
+            {
+                $this->response->setType("N");
+                $this->response->setMessages("Event not created");
+    
+                return resonse()->json($this->response->toString(), 500);
+            }
+    
+            $this->response->setType("S");
+            $this->response->setMessages("Event created");
+            $this->response->setDataSet("event", $returnEvent);
+    
+            return resonse()->json($this->response->toString());
+        }
+        else 
         {
             $this->response->setType("N");
-            $this->response->setMessages("Event not created");
+            $this->response->setMessages("You don't have permission to create a event");
 
             return resonse()->json($this->response->toString(), 500);
         }
-
-        $this->response->setType("S");
-        $this->response->setMessages("Event created");
-        $this->response->setDataSet("user", $returnEvent);
-
-        return resonse()->json($this->response->toString());
     }
 
     /**
@@ -76,7 +94,21 @@ class EventController extends Controller
      */
     public function show($id)
     {
-        //
+        $events = $this->event->find($id);
+
+        if(!$events)
+        {
+            $this->response->setType("N");
+            $this->response->setMessages("Event not found");
+    
+            return resonse()->json($this->response->toString(), 404);
+        }
+
+        $this->response->setType("S");
+        $this->response->setMessages("Sucess!");
+        $this->response->setDataSet("event", $events);
+    
+        return resonse()->json($this->response->toString());
     }
 
     /**
@@ -97,7 +129,22 @@ class EventController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $events = $this->event->find($id);
+        
+        if(!$events)
+        {
+            $this->response->setType("N");
+            $this->response->setMessages("Event not found");
+    
+            return resonse()->json($this->response->toString(), 404);
+        }
+
+        $events->fill($request->all());
+        $events->save();
+
+        $this->response->setTypeS("S");
+        $this->response->setDataSet("event", $events);
+        $this->response->setMessages("Event updated successfully!");
     }
 
     /**
@@ -108,6 +155,16 @@ class EventController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $events = $this->event->find($id);
+        
+        if(!$events)
+        {
+            $this->response->setType("N");
+                $this->response->setMessages("Event not found");
+    
+                return resonse()->json($this->response->toString(), 404);
+        }
+
+        $events->delete();
     }
 }
