@@ -19,10 +19,14 @@ Route::post('/register', 'UserController@store');
 Route::post('/login', 'UserController@login');
 
 Route::group(['middleware' => 'jwt.auth'], function () {
+    
+    //routes of users
     Route::resource('user', 'UserController', ['except' => [
         'store',
     ]]);
-
-    Route::resource('type-user', 'TypeUserController');
+    
+    //routes of events
+    Route::resource('event', 'EventController');
+    Route::post('add-artist/event/{event}/artist', 'EventController@addArtistToEvent');
 });
 
