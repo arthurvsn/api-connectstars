@@ -28,19 +28,18 @@ class UserService extends Service
             $returnUser = $this->user->create([
                 'username' => $request->get('username'),
                 'name' => $request->get('name'),
-                'name' => $request->get('email'),
-                'name' => $request->get('user_type'),
+                'email' => $request->get('email'),
                 'password' => bcrypt($request->get('password')),
                 'user_type' => $request->get('user_type'),
             ]);
             
-            return $returnUser;
         }
         catch(Exception $e)
         {
             return false;
         }
 
+        return $returnUser;
     }
 }
 ?>

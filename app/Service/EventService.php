@@ -63,9 +63,9 @@ class EventService extends Service
                 try
                 {
                     $returnAdd = $this->artistOnEvent->create([
-                        'amount_artist_receive' => $request->get('amount_artist_receive'),
-                        'user_id' => $value->user_id,
-                        'event_id' => $eventId
+                        'amount_artist_receive' => $value['amount_artist_receive'],
+                        'user_id' => $value['user_id'],
+                        'event_id' => $eventId,
                     ]);
                 }
                 catch(Exception $e)
@@ -74,7 +74,7 @@ class EventService extends Service
                 }
             }
             
-            return $returnAdd;        
+            return $returnAdd;
         }
         else
         {

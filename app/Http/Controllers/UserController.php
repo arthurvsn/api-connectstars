@@ -90,8 +90,8 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $user = $this->userService->create($request);
-        if ($user)
+        $returnUser = $this->userService->createUser($request);
+        if ($returnUser)
         {
             $this->response->setType("S");
             $this->response->setDataSet("user", $returnUser);            

@@ -41,7 +41,7 @@ class EventController extends Controller
         $this->response->setMessages("Sucess");
         $this->response->setDataSet("events", $events);
 
-        return resonse()->json($this->response->toString());
+        return response()->json($this->response->toString());
     }
 
     /**
@@ -62,30 +62,30 @@ class EventController extends Controller
     {
         $user_logged = $this->eventService->getAuthUser($request);
 
-        if($user_logged->type_user == "CONTRACTOR")
+        if($user_logged->user_type == "CONTRACTOR")
         {
             $returnEvent = $this->eventService->createEvent($request);
     
-            if(!$event)
+            if(!$returnEvent)
             {
                 $this->response->setType("N");
                 $this->response->setMessages("Event not created");
     
-                return resonse()->json($this->response->toString(), 500);
+                return response()->json($this->response->toString(), 500);
             }
     
             $this->response->setType("S");
             $this->response->setMessages("Event created");
             $this->response->setDataSet("event", $returnEvent);
     
-            return resonse()->json($this->response->toString());
+            return response()->json($this->response->toString());
         }
         else 
         {
             $this->response->setType("N");
             $this->response->setMessages("You don't have permission to create a event");
 
-            return resonse()->json($this->response->toString(), 500);
+            return response()->json($this->response->toString(), 500);
         }
     }
 
@@ -104,14 +104,14 @@ class EventController extends Controller
             $this->response->setType("N");
             $this->response->setMessages("Event not found");
     
-            return resonse()->json($this->response->toString(), 404);
+            return response()->json($this->response->toString(), 404);
         }
 
         $this->response->setType("S");
         $this->response->setMessages("Sucess!");
         $this->response->setDataSet("event", $events);
     
-        return resonse()->json($this->response->toString());
+        return response()->json($this->response->toString());
     }
 
     /**
@@ -139,13 +139,13 @@ class EventController extends Controller
             $this->response->setType("N");
             $this->response->setMessages("Event not found");
     
-            return resonse()->json($this->response->toString(), 404);
+            return response()->json($this->response->toString(), 404);
         }
 
         $events->fill($request->all());
         $events->save();
 
-        $this->response->setTypeS("S");
+        $this->response->setType("S");
         $this->response->setDataSet("event", $events);
         $this->response->setMessages("Event updated successfully!");
     }
@@ -164,7 +164,7 @@ class EventController extends Controller
             $this->response->setType("N");
             $this->response->setMessages("Event not found");
 
-            return resonse()->json($this->response->toString(), 404);
+            return response()->json($this->response->toString(), 404);
         }
 
         $events->delete();
@@ -185,14 +185,24 @@ class EventController extends Controller
             $this->response->setType("N");
             $this->response->setMessages("Event not found");
 
-            return resonse()->json($this->response->toString(), 404);
+            return response()->json($this->response->toString(), 404);
         }
         else
         {
-            $addArtistToEvent = $this->eventService->addArtistOnEvent($idEvento, $idArtist, $request);
+            $addArtistToEvent = $this->eventService->addArtistOnEvent($idEvent, $request);
     
             if(!$addArtistToEvent)
             {
+                $this->response->setType("N");
+                $this->response->setMessages("Artist don't add at event!");
+                return response()->json($this->response->toString(), 500);
+            }
+            else
+            {
+                $this->response->setType("S");
+                $this->response->setDataSet("Event", $addArtistToEvent);
+                $this->response->setMessages("Artist add a event!");
+                return response()->json($this->response->toString());
             }
         }
     }
