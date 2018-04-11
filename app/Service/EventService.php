@@ -10,12 +10,20 @@ class EventService extends Service
     private $event;
     private $artistOnEvent;
 
-    public function __construct() 
+    /**
+     * Construct
+     */
+    public function __construct()
     {
         $this->event = new Event();
         $this->artistOnEvent = new ArtistOnEvent();
     }
 
+    /**
+     * Create event \App\Event
+     * @param  \Illuminate\Http\Request  $request
+     * @return object $returnEvent or false
+     */
     public function createEvent(Request $request)
     {
         try
@@ -37,22 +45,41 @@ class EventService extends Service
         }
     }
 
-    public function addArtistOnEvent($eventId, $artistId, Request $request)
+    /**
+     * Add a artist to event
+     * @param int $eventId
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function addArtistOnEvent($eventId, Request $request)
     {
-        try
-        {
-            $returnAdd = $this->artistOnEvent->create([
-                'amount_artist_receive' => $request->get('amount_artist_receive'),
-                'user_id' => $artistId,
-                'event_id' => $eventId
-            ]);
+        
+        $arrayArtists = $request->get('artists');
 
-            return $returnAdd;
+        if(is_array($arrayArtists))
+        {
+            foreach($arrayArtists as $key => $value)
+            {
+                try
+                {
+                    $returnAdd = $this->artistOnEvent->create([
+                        'amount_artist_receive' => $request->get('amount_artist_receive'),
+                        'user_id' => $value->user_id,
+                        'event_id' => $eventId
+                    ]);
+                }
+                catch(Exception $e)
+                {
+                    return false;
+                }
+            }
+            
+            return $returnAdd;        
         }
-        catch(Exception $e)
+        else
         {
             return false;
-        }
+        }     
     }
 }
 ?>

@@ -126,8 +126,8 @@ class EventController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
@@ -152,7 +152,6 @@ class EventController extends Controller
 
     /**
      * Remove the specified resource from storage.
-     *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -163,23 +162,38 @@ class EventController extends Controller
         if(!$events)
         {
             $this->response->setType("N");
-                $this->response->setMessages("Event not found");
-    
-                return resonse()->json($this->response->toString(), 404);
+            $this->response->setMessages("Event not found");
+
+            return resonse()->json($this->response->toString(), 404);
         }
 
         $events->delete();
     }
 
     /**
-     * 
+     * Method to call service to add artist's to Event
+     * @param int $idEvent
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
      */
-    public function addArtistToEvent($idEvento, $idArtist, Request $request)
+    public function addArtistToEvent($idEvent, Request $request)
     {
-        $addArtistToEvent = $this->eventService->addArtistOnEvent($idEvento, $idArtist, $request);
+        $events = $this->event->find($idEvent);
 
-        if(!$addArtistToEvent)
+        if(!$events) 
         {
+            $this->response->setType("N");
+            $this->response->setMessages("Event not found");
+
+            return resonse()->json($this->response->toString(), 404);
+        }
+        else
+        {
+            $addArtistToEvent = $this->eventService->addArtistOnEvent($idEvento, $idArtist, $request);
+    
+            if(!$addArtistToEvent)
+            {
+            }
         }
     }
 }

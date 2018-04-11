@@ -8,7 +8,9 @@ use JWTAuthException;
 class Service
 {
     /**
-     * Metodo para saber o usuario logado
+     * Method to search a user logged
+     * @param  \Illuminate\Http\Request  $request
+     * @return object $user
      */
     public function getAuthUser(Request $request)
     {
