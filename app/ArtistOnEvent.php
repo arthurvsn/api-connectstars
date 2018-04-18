@@ -9,6 +9,7 @@ class ArtistOnEvent extends Model
 {
     protected $fillable = [
         'amount_artist_receive',
+        'artist_confirmed',
         'user_id',
         'event_id',
     ];
