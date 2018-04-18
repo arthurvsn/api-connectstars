@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use DB;
 
 class ArtistOnEvent extends Model
 {
@@ -11,4 +12,14 @@ class ArtistOnEvent extends Model
         'user_id',
         'event_id',
     ];
+
+    public function getArtistOnEvent($idEvent, $idArtist)
+    {
+        $artistOnEvent = DB::table('artist_on_events')
+            ->whereColumn([
+                    ['event_id', '=', $idEvent],
+                    ['artist_id', '=', $idArtist]
+                ])
+            ->first();
+    }
 }

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use JWTAuth;
 use JWTAuthException;
 use \App\Event;
+use \App\User;
 use \App\ArtistOnEvent;
 use \App\Response\Response;
 use \App\Service\EventService;
@@ -14,6 +15,7 @@ class EventController extends Controller
 {
     private $response;
     private $event;
+    private $user;
     private $eventService;
     private $artistOnEvent;
 
@@ -24,6 +26,7 @@ class EventController extends Controller
     {
         $this->response = new Response();
         $this->event = new Event();
+        $this->user = new User();
         $this->eventService = new EventService();
         $this->artistOnEvent = new ArtistOnEvent();
     }
@@ -202,6 +205,47 @@ class EventController extends Controller
                 $this->response->setType("S");
                 $this->response->setDataSet("Event", $addArtistToEvent);
                 $this->response->setMessages("Artist add a event!");
+                return response()->json($this->response->toString());
+            }
+        }
+    }
+
+    public function confirmArtistToEvent($idEvent, $idArtist, Request $request)
+    {
+        //Search a Event
+        $events = $this->event->find($idEvent);
+        
+        //search Artist
+        $artists = $this->user->find($idArtist);
+
+        if(!$events || !$artists || $artist->type_user != "Artist") 
+        {
+            $this->response->setType("N");
+            $this->response->setMessages("Event not found");
+
+            return response()->json($this->response->toString(), 404);
+        }
+        else
+        {
+            //search a id where artist is on event
+            $artistOnEvents = $artistOnEvent->getArtistOnEvent($idEvent, $idArtist);
+
+            if(!$artistOnEvents) 
+            {
+                $this->response->setType("N");
+                $this->response->setMessages("Request to change a cofirmed artist not completed");
+
+                return response()->json($this->response->toString(), 404);
+            }
+            else 
+            {
+                $artistOnEvents->fill($request->all());
+                $artistOnEvents->save();
+
+                $this->response->setType("S");
+                $this->response->setMessages("Artist change a status on event");
+                $this->response->setDataSet("Change Artist", $artistOnEvents);
+
                 return response()->json($this->response->toString());
             }
         }

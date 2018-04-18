@@ -28,5 +28,6 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     //routes of events
     Route::resource('event', 'EventController');
     Route::post('add-artist/event/{event}/artist', 'EventController@addArtistToEvent');
+    Route::post('confirm-artist/event/{event}/artist/{artist}', 'EventController@confirmArtistToEvent');
 });
 

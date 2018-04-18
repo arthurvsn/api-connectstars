@@ -64,6 +64,7 @@ class EventService extends Service
                 {
                     $returnAdd = $this->artistOnEvent->create([
                         'amount_artist_receive' => $value['amount_artist_receive'],
+                        'artist_confirmed' => 'pending',
                         'user_id' => $value['user_id'],
                         'event_id' => $eventId,
                     ]);
