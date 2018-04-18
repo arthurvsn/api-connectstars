@@ -14,14 +14,17 @@ class CreateArtistOnEventsTable extends Migration
     public function up()
     {
         Schema::create('artist_on_events', function (Blueprint $table) {
-            $table->increments('id');
+            
+            $table->integer('event_id')->unsigned();
+            $table->integer('user_id')->unsigned();
+            
+            $table->primary(['user_id', 'event_id']);
+
             $table->double('amount_artist_receive');
             $table->enum('artist_confirmed', ['yes', 'no', 'pending'])->default('pending');
 
-            $table->integer('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users');
-            
-            $table->integer('event_id')->unsigned();
+
             $table->foreign('event_id')->references('id')->on('events');
 
             $table->timestamps();
