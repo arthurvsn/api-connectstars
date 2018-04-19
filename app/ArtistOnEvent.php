@@ -22,5 +22,7 @@ class ArtistOnEvent extends Model
                     ['artist_id', '=', $idArtist]
                 ])
             ->first();
+
+        return $artistOnEvent;
     }
 }

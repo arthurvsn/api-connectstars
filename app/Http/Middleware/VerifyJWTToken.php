@@ -4,8 +4,16 @@ use Closure;
 use JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use \App\Response\Response;
+
 class VerifyJWTToken
 {
+    private $response;
+
+    public function __construct() 
+    {
+        $this->response = new Response();
+    }
     /**
      * Handle an incoming request.
      *
@@ -32,15 +40,21 @@ class VerifyJWTToken
         {
             if($e instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException) 
             {
-                return response()->json(['token_expired'], $e->getStatusCode());
+                $this->response->setType("N");
+                $this->response->setMessages("token_expired", $e->getStatusCode());
+                return response()->json($this->response->toString());
             }
             else if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException) 
             {
-                return response()->json(['token_invalid'], $e->getStatusCode());
+                $this->response->setType("N");
+                $this->response->setMessages("token_invalid", $e->getStatusCode());
+                return response()->json($this->response->toString());
             }
             else
             {
-                return response()->json(['error'=>'Token is required']);
+                $this->response->setType("N");
+                $this->response->setMessages("error", 'Token is required');
+                return response()->json($this->response->toString());
             }
         }
        return $next($request);

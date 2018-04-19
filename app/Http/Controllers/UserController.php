@@ -50,11 +50,10 @@ class UserController extends Controller
         $user = JWTAuth::toUser($token);
         
         $this->response->setType("S");
-        $this->response->setDataSet("token", $token);
         $this->response->setMessages("Login successfully!");
+        $this->response->setDataSet("token", $token);
         
-        $this->response->setDataSet("name", $user->name);
-        $this->response->setDataSet("user_type", $user->user_type);
+        $this->response->setDataSet("user", $user);
         return response()->json($this->response->toString(), 200);
     }
 
