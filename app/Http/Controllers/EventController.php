@@ -40,7 +40,7 @@ class EventController extends Controller
     {   
         $user_logged = $this->eventService->getAuthUser($request);
 
-        if(!$user_logged)
+        if(!$user_logged || $user_logged->user_type == "ARTIST")
         {
             $this->response->setType("N");
             $this->response->setMessages("User not logged");
@@ -254,6 +254,13 @@ class EventController extends Controller
         }
     }
 
+    /**
+     * Method to confirm artist on Event
+     * @param int $idEvent
+     * @param int $idArtist
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function confirmArtistToEvent($idEvent, $idArtist, Request $request)
     {
         try
