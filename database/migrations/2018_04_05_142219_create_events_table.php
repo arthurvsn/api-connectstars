@@ -21,6 +21,10 @@ class CreateEventsTable extends Migration
             $table->double('ticket_price');
             $table->time('duration');
             $table->dateTime('event_date');
+
+            $table->integer('user_id')->unsigned();
+            $table->foreign('user_id')->references('id')->on('users');
+            
             $table->timestamps();
         });
     }

@@ -89,20 +89,22 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $returnUser = $this->userService->createUser($request);
-        if ($returnUser)
+        try
         {
+            $returnUser = $this->userService->createUser($request);
             $this->response->setType("S");
             $this->response->setDataSet("user", $returnUser);            
             $this->response->setMessages("Created user successfully!");
+            
+            return response()->json($this->response->toString());
         }
-        else 
+        catch (Exception $e)
         {
             $this->response->setType("N");
-            $this->response->setMessages("Error to create a user!");
+            $this->response->setMessages($e->getMessage());
+
+            return response()->json($this->response->toString(), 500);
         }
-        
-        return response()->json($this->response->toString());
     }
 
     /**
@@ -149,23 +151,33 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $user = User::find($id);
-        
-        if(!$user) 
+        try
+        {
+            $user = User::find($id);
+            
+            if(!$user) 
+            {
+                $this->response->setType("N");
+                $this->response->setMessages("Record not found!");
+    
+                return response()->json($this->response->toString(), 404);
+            }
+    
+            $user->fill($request->all());
+            $user->save();
+            $this->response->setTypeS("S");
+            $this->response->setDataSet("user", $user);
+            $this->response->setMessages("User updated successfully !");
+    
+            return response()->json($this->response->toString());
+        }
+        catch (Exception $e)
         {
             $this->response->setType("N");
-            $this->response->setMessages("Record not found!");
+            $this->response->setMessages($e->getMessage());
 
-            return response()->json($this->response->toString(), 404);
+            return response()->json($this->response->toString(), 500);
         }
-
-        $user->fill($request->all());
-        $user->save();
-        $this->response->setTypeS("S");
-        $this->response->setDataSet("user", $user);
-        $this->response->setMessages("User updated successfully !");
-
-        return response()->json($this->response->toString());
     }
 
     /**
@@ -176,16 +188,28 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        $user = User::find($id);
+        try
+        {
+            $user = User::find($id);
 
-        if(!$user) 
+            if(!$user) 
+            {
+                $this->response->setType("N");
+                $this->response->setMessages("Record not found!");
+
+                return response()->json($this->response->toString(), 404);
+            }
+
+            $user->delete();
+
+        }
+        catch (Exception $e)
         {
             $this->response->setType("N");
-            $this->response->setMessages("Record not found!");
+            $this->response->setMessages($e->getMessage());
 
-            return response()->json($this->response->toString(), 404);
+            return response()->json($this->response->toString(), 500);
         }
-
-        $user->delete();
+        
     }
 }

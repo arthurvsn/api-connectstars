@@ -22,7 +22,7 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     
     //routes of users
     Route::resource('user', 'UserController', ['except' => [
-        'store',
+        'store', 'index'
     ]]);
     
     //routes of events

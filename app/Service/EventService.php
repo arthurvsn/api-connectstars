@@ -24,24 +24,25 @@ class EventService extends Service
      * @param  \Illuminate\Http\Request  $request
      * @return object $returnEvent or false
      */
-    public function createEvent(Request $request)
+    public function createEvent(Request $request, $userId)
     {
         try
         {
             $returnEvent = $this->event->create([
-                'name' => $request->get('name'),
-                'description' => $request->get('description'),
-                'local' => $request->get('local'),
-                'ticket_price' => $request->get('ticket_price'),
-                'duration' => $request->get('duration'),
-                'event_date' => $request->get('event_date'),
+                'name'          => $request->get('name'),
+                'description'   => $request->get('description'),
+                'local'         => $request->get('local'),
+                'ticket_price'  => $request->get('ticket_price'),
+                'duration'      => $request->get('duration'),
+                'event_date'    => $request->get('event_date'),
+                'user_id'       => $userId,
             ]);
             
             return $returnEvent;
         }
         catch(Exception $e)
         {
-            return false;
+            throw new Exception("Error to create an event", 0, $e);
         }
     }
 
@@ -71,7 +72,7 @@ class EventService extends Service
                 }
                 catch(Exception $e)
                 {
-                    return false;
+                    throw new Exception("Error to create a event", 0, $e);
                 }
             }
             
