@@ -167,7 +167,7 @@ class UserController extends Controller
             $user->save();
             $this->response->setTypeS("S");
             $this->response->setDataSet("user", $user);
-            $this->response->setMessages("User updated successfully !");
+            $this->response->setMessages("User on event updated successfully !");
     
             return response()->json($this->response->toString());
         }
