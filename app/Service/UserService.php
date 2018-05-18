@@ -36,7 +36,7 @@ class UserService extends Service
         }
         catch(Exception $e)
         {
-            return false;
+            throw new Exception("Error to create a user", 0, $e);
         }
 
         return $returnUser;
