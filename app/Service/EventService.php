@@ -72,7 +72,7 @@ class EventService extends Service
                 }
                 catch(Exception $e)
                 {
-                    throw new Exception("Error to create a event", 0, $e);
+                    throw new Exception("Error to create a event");
                 }
             }
             

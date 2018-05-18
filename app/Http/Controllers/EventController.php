@@ -95,7 +95,7 @@ class EventController extends Controller
                 return response()->json($this->response->toString(), 500);
             }
         }
-        catch(Exception $e)
+        catch(\Exception $e)
         {
             $this->response->setType("N");
             $this->response->setMessages($e->getMessage());
@@ -168,7 +168,7 @@ class EventController extends Controller
 
             return response()->json($this->response->toString());
         }
-        catch (Exception $e)
+        catch (\Exception $e)
         {
             $this->response->setType("N");
             $this->response->setMessages($e->getMessage());
@@ -198,7 +198,7 @@ class EventController extends Controller
     
             $events->delete();
         }
-        catch (Exception $e)
+        catch (\Exception $e)
         {
             $this->response->setType("N");
             $this->response->setMessages($e->getMessage());
@@ -215,42 +215,35 @@ class EventController extends Controller
      */
     public function addArtistToEvent($idEvent, Request $request)
     {
-        try
-        {
-            $events = $this->event->find($idEvent);
-    
-            if(!$events) 
-            {
-                $this->response->setType("N");
-                $this->response->setMessages("Event not found");
-    
-                return response()->json($this->response->toString(), 404);
-            }
-            else
-            {
-                $addArtistToEvent = $this->eventService->addArtistOnEvent($idEvent, $request);
         
-                if(!$addArtistToEvent)
-                {
-                    $this->response->setType("N");
-                    $this->response->setMessages("Artist don't add at event!");
-                    return response()->json($this->response->toString(), 500);
-                }
-                else
-                {
-                    $this->response->setType("S");
-                    $this->response->setDataSet("Event", $addArtistToEvent);
-                    $this->response->setMessages("Artist add a event!");
-                    return response()->json($this->response->toString());
-                }
-            }
-        }
-        catch(Exception $e)
+        $events = $this->event->find($idEvent);
+
+        if(!$events) 
         {
             $this->response->setType("N");
-            $this->response->setMessages($e->getMessage());
+            $this->response->setMessages("Event not found");
 
-            return response()->json($this->response->toString(), 500);
+            return response()->json($this->response->toString(), 404);
+        }
+        else
+        {
+            try
+            {
+                $addArtistToEvent = $this->eventService->addArtistOnEvent($idEvent, $request);
+
+                $this->response->setType("S");
+                $this->response->setDataSet("Event", $addArtistToEvent);
+                $this->response->setMessages("Artist add a event!");
+                
+                return response()->json($this->response->toString());
+            }
+            catch(\Exception $e)
+            {
+                $this->response->setType("N");
+                $this->response->setMessages($e->getMessage());
+
+                return response()->json($this->response->toString(), 500);
+            }
         }
     }
 
@@ -270,8 +263,8 @@ class EventController extends Controller
             
             //search Artist
             $artists = $this->user->find($idArtist);
-    
-            if(!$events || !$artists || $artist->type_user != "Artist") 
+            
+            if(!$events || !$artists || $artists->user_type != "ARTIST") 
             {
                 $this->response->setType("N");
                 $this->response->setMessages("Incorrect data!");
@@ -281,8 +274,8 @@ class EventController extends Controller
             else
             {
                 //search a id where artist is on event
-                $artistOnEvents = $this->artistOnEvent->getArtistOnEvent($idEvent, $idArtist);
-    
+                $artistOnEvents = $this->artistOnEvent->getArtistOnEvent($idEvent, $idArtist, $request->get('artist_confirmed'));
+                
                 if(!$artistOnEvents)
                 {
                     $this->response->setType("N");
@@ -292,18 +285,15 @@ class EventController extends Controller
                 }
                 else 
                 {
-                    $artistOnEvents->fill($request->all());
-                    $artistOnEvents->save();
-    
                     $this->response->setType("S");
                     $this->response->setMessages("Artist changed your status on event");
-                    $this->response->setDataSet("Change Artist", $artistOnEvents);
+                    $this->response->setDataSet("Change Artist", $artists);
     
                     return response()->json($this->response->toString());
                 }
             }            
         }
-        catch (Exception $e)
+        catch (\Exception $e)
         {
             $this->response->setType("N");
             $this->response->setMessages($e->getMessage());

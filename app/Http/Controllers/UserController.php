@@ -17,9 +17,9 @@ class UserController extends Controller
 
     public function __construct(User $user) 
     {
-        $this->user = new User;
-        $this->response = new Response();
-        $this->userService = new UserService();
+        $this->user         = new User;
+        $this->response     = new Response();
+        $this->userService  = new UserService();
     }
 
     /**
@@ -171,7 +171,7 @@ class UserController extends Controller
     
             return response()->json($this->response->toString());
         }
-        catch (Exception $e)
+        catch (\Exception $e)
         {
             $this->response->setType("N");
             $this->response->setMessages($e->getMessage());
@@ -203,7 +203,7 @@ class UserController extends Controller
             $user->delete();
 
         }
-        catch (Exception $e)
+        catch (\Exception $e)
         {
             $this->response->setType("N");
             $this->response->setMessages($e->getMessage());
