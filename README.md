@@ -28,4 +28,4 @@ Tenha também o laravel a partir da versão 5.4.
 </ul>
 
 # Para saber as rotas da aplicação
-<pre>$ php artisa route:list</pre>
+<pre>$ php artisan route:list</pre>
