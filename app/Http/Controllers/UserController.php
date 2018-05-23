@@ -37,7 +37,7 @@ class UserController extends Controller
            {
                $this->response->setType("N");
                $this->response->setMessages("invalid_username_or_password");
-               return response()->json($this->response->toString(), 422);
+               return response()->json($this->response->toString());
            }
         } 
         catch (JWTAuthException $e) 
@@ -65,7 +65,7 @@ class UserController extends Controller
     public function index()
     {
         $users = User::get();
-
+        
         $this->response->setType("S");
         $this->response->setDataSet("user", $users);
         $this->response->setMessages("Sucess!");
