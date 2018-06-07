@@ -3,8 +3,9 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use DB;
 
-class Addres extends Model
+class Address extends Model
 {
     protected $fillable = [
         'street',
@@ -15,9 +16,20 @@ class Addres extends Model
         'user_id',
     ];
 
+    protected $hidden = [
+        'updated_at',
+        'deleted_at'
+    ];
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class);
+    }
+    
     public function getAddressUser($userId)
     {
-        $address = DB::table('address')
+        $address = DB::table('addresses')
+            ->select('street', 'city', 'state', 'zip_code','country')
             ->where('user_id', '=', $userId)
             ->get();
         

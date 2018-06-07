@@ -16,13 +16,14 @@ class CreatePhonesTable extends Migration
         Schema::create('phones', function (Blueprint $table) {
             $table->increments('id');
 
-            $table->number('country_code', 3);
-            $table->string('number', 15);
+            $table->integer('country_code')->nullable();
+            $table->string('number', 15)->nullable();
 
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users');
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

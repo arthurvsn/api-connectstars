@@ -17,9 +17,9 @@ class CreateUsersTable extends Migration
             $table->increments('id');
 
             $table->string('name');
-            $table->string('profile_picture');
             $table->string('username', 25)->unique();
             $table->string('email', 80)->unique();
+            $table->string('profile_picture');
             $table->string('password');
             $table->enum('user_type', ['ARTIST', 'CONTRACTOR']);
             

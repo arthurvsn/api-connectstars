@@ -3,7 +3,7 @@ namespace App\Service;
 
 use Illuminate\Http\Request;
 use App\User;
-use App\Addres;
+use App\Address;
 use App\Phone;
 
 class UserService extends Service
@@ -18,7 +18,7 @@ class UserService extends Service
     public function __construct() 
     {
         $this->user     = new User();
-        $this->address  = new Addres();
+        $this->address  = new Address();
         $this->phone    = new Phone();
     }
 
@@ -28,15 +28,16 @@ class UserService extends Service
      * @return object $user or false
      */
     public function createUser(Request $request)
-    {
+    {  
         try
         {
             $returnUser = $this->user->create([
-                'username'  => $request->get('username'),
-                'name'      => $request->get('name'),
-                'email'     => $request->get('email'),
-                'password'  => bcrypt($request->get('password')),
-                'user_type' => $request->get('user_type'),
+                'name'              => $request->get('name'),
+                'username'          => $request->get('username'),
+                'profile_picture'   => $request->get('profile_picture'),
+                'email'             => $request->get('email'),
+                'password'          => bcrypt($request->get('password')),
+                'user_type'         => $request->get('user_type'),
             ]);
         }
         catch(Exception $e)
@@ -55,16 +56,17 @@ class UserService extends Service
      */
     public function createAddressUser($userId, Request $request) 
     {
+        $returnAddressUser = [];
         try 
         {
-            foreach ($request->get('addres') as $key => $value)
+            foreach ($request->get('addresses') as $key => $value)
             {
-                $returnAddressUser[] = $this->user->create([
-                    'street'    => $request->get('street'),
-                    'city'      => $request->get('city'),
-                    'state'     => $request->get('state'),
-                    'zip_code'  => $request->get('zip_code'),
-                    'country'   => $request->get('country'),
+                $returnAddressUser[] = $this->address->create([
+                    'street'    => $value['street'],
+                    'city'      => $value['city'],
+                    'state'     => $value['state'],
+                    'zip_code'  => $value['zip_code'],
+                    'country'   => $value['country'],
                     'user_id'   => $userId,
                 ]);
             }
@@ -85,13 +87,14 @@ class UserService extends Service
      */
     public function createPhoneUser($userId, Request $request)
     {
+        $returnPhoneUser = [];
         try 
         {
-            foreach ($request->get('addres') as $key => $value)
+            foreach ($request->get('phones') as $key => $value)
             {
                 $returnPhoneUser[] = $this->phone->create([
-                    'country_code'  => $request->get('country_code'),
-                    'number'        => $request->get('number'),
+                    'country_code'  => $value['country_code'],
+                    'number'        => $value['number'],
                     'user_id'       => $userId,
                 ]);
             }

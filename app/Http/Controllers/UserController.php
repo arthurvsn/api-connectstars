@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\User;
+use App\Address;
+use App\Phone;
 use JWTAuth;
 use JWTAuthException;
 use \App\Response\Response;
@@ -11,13 +13,17 @@ use \App\Service\UserService;
 
 class UserController extends Controller
 {
-    private $response;
     private $user;
+    private $address;
+    private $phone;
+    private $response;
     private $userService;
 
     public function __construct(User $user) 
     {
         $this->user         = new User;
+        $this->address      = new Address;
+        $this->phone        = new Phone;
         $this->response     = new Response();
         $this->userService  = new UserService();
     }
@@ -91,35 +97,41 @@ class UserController extends Controller
     {
         try
         {
+            \DB::beginTransaction();
             $returnUser = $this->userService->createUser($request);
 
             $returnUser->address = $this->userService->createAddressUser($returnUser->id, $request);
             $returnUser->phone = $this->userService->createPhoneUser($returnUser->id, $request);
-
+            
             $this->response->setType("S");
             $this->response->setDataSet("user", $returnUser);            
             $this->response->setMessages("Created user successfully!");
             
-            return response()->json($this->response->toString());
         }
         catch (\Exception $e)
         {
+            \DB::rollBack();
             $this->response->setType("N");
             $this->response->setMessages($e->getMessage());
 
             return response()->json($this->response->toString(), 500);
         }
+
+        \DB::commit();
+        return response()->json($this->response->toString());
     }
 
     /**
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Re  sponse
      */
     public function show($id)
     {
         $user = $this->user->find($id);
+        $address = $this->address->getAddressUser($id);
+        $phone = $this->phone->getPhoneUser($id);
 
         if(!$user)
         {
@@ -129,6 +141,9 @@ class UserController extends Controller
         }
         else 
         {
+            $user->addresses = $address;
+            $user->phones = $phone;
+            
             $this->response->setType("S");
             $this->response->setDataSet("user", $user);
             $this->response->setMessages("Show user successfully!");
