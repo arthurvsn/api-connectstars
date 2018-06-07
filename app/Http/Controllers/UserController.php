@@ -92,13 +92,17 @@ class UserController extends Controller
         try
         {
             $returnUser = $this->userService->createUser($request);
+
+            $returnUser->address = $this->userService->createAddressUser($returnUser->id, $request);
+            $returnUser->phone = $this->userService->createPhoneUser($returnUser->id, $request);
+
             $this->response->setType("S");
             $this->response->setDataSet("user", $returnUser);            
             $this->response->setMessages("Created user successfully!");
             
             return response()->json($this->response->toString());
         }
-        catch (Exception $e)
+        catch (\Exception $e)
         {
             $this->response->setType("N");
             $this->response->setMessages($e->getMessage());

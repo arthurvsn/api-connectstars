@@ -16,18 +16,19 @@ class CreateArtistOnEventsTable extends Migration
         Schema::create('artist_on_events', function (Blueprint $table) {
             
             $table->integer('event_id')->unsigned();
-            $table->integer('user_id')->unsigned();
+            $table->integer('artist_id')->unsigned();
             
-            $table->primary(['user_id', 'event_id']);
+            $table->primary(['artist_id', 'event_id']);
 
             $table->double('amount_artist_receive');
             $table->enum('artist_confirmed', ['yes', 'no', 'pending'])->default('pending');
 
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('artist_id')->references('id')->on('users');
 
             $table->foreign('event_id')->references('id')->on('events');
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -10,7 +10,7 @@ class ArtistOnEvent extends Model
     protected $fillable = [
         'amount_artist_receive',
         'artist_confirmed',
-        'user_id',
+        'artist_id',
         'event_id',
     ];
 
@@ -19,7 +19,7 @@ class ArtistOnEvent extends Model
         $artistOnEvent = DB::table('artist_on_events')
             ->where([
                     ['event_id', $idEvent],
-                    ['user_id', $idArtist],
+                    ['contractor_id', $idArtist],
                 ])
             ->update(['artist_confirmed' => $artist_confirmed]);
 
