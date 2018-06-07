@@ -26,6 +26,11 @@ class Address extends Model
         return $this->belongsToMany(User::class);
     }
     
+    /**
+     * Get information address o user
+     * @param int $userId
+     * @return object $address
+     */
     public function getAddressUser($userId)
     {
         $address = DB::table('addresses')

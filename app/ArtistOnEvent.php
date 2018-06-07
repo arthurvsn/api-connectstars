@@ -14,12 +14,19 @@ class ArtistOnEvent extends Model
         'event_id',
     ];
 
-    public function getArtistOnEvent($idEvent, $idArtist, $artist_confirmed)
+    /**
+     * Get artist on Event
+     * @param int $eventId
+     * @param int $artistId
+     * @param string $artist_confirmed
+     * @return object $artistOnEvent
+     */
+    public function getArtistOnEvent($eventId, $artistId, $artist_confirmed)
     {
         $artistOnEvent = DB::table('artist_on_events')
             ->where([
-                    ['event_id', $idEvent],
-                    ['contractor_id', $idArtist],
+                    ['event_id', $eventId],
+                    ['contractor_id', $artistId],
                 ])
             ->update(['artist_confirmed' => $artist_confirmed]);
 

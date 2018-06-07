@@ -17,10 +17,15 @@ class Event extends Model
         'contractor_id',
     ];
 
-    public function getEventsWithIdUser($id)
+    /**
+     * Get event artistOnEvent id user
+     * @param $userId
+     * @return object
+     */
+    public function getEventsWithIdUser($userId)
     {
         $events = DB::table('events')
-            ->where('contractor_id', '=', $id)
+            ->where('contractor_id', '=', $userId)
             ->get();
         
         return $events;

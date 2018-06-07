@@ -23,13 +23,18 @@ class Phone extends Model
         return $this->belongsToMany(User::class);
     }
 
+    /**
+     * Get number phones according id user
+     * @param int $userId
+     * @return object $phones
+     */
     public function getPhoneUser($userId)
     {
-        $address = DB::table('phones')
+        $phones = DB::table('phones')
             ->select('country_code', 'number')
             ->where('user_id', '=', $userId)
             ->get();
         
-        return $address;
+        return $phones;
     }
 }
