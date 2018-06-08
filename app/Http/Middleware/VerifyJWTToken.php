@@ -53,7 +53,7 @@ class VerifyJWTToken
             else
             {
                 $this->response->setType("N");
-                $this->response->setMessages("error", 'Token is required');
+                $this->response->setMessages("Token is required");
                 return response()->json($this->response->toString());
             }
         }

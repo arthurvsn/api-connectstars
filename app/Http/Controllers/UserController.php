@@ -184,7 +184,7 @@ class UserController extends Controller
     
             $user->fill($request->all());
             $user->save();
-            $this->response->setTypeS("S");
+            $this->response->setType("S");
             $this->response->setDataSet("user", $user);
             $this->response->setMessages("User on event updated successfully !");
     
@@ -230,5 +230,30 @@ class UserController extends Controller
             return response()->json($this->response->toString(), 500);
         }
         
+    }
+
+    /**
+     * 
+     */
+    public function getUserLogged(Request $resquest)
+    {
+        try
+        {
+            $user = $this->userService->getAuthUser($resquest);
+
+            $this->response->setType("S");
+            $this->response->setMessages("Show user successfully!");
+            $this->response->setDataSet("user", $user);
+
+        }
+        catch (\Exception $e)
+        {
+            $this->response->setType("N");
+            $this->response->setMessages($e->getMessage());
+
+            return response()->json($this->response->toString(), 500);
+        }
+        
+        return response()->json($this->response->toString());
     }
 }
