@@ -15,11 +15,12 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'username',
         'name', 
+        'username',
         'email',
+        'profile_picture',
         'password', 
-        'user_type'
+        'user_type',
     ];
 
     /**
@@ -29,10 +30,20 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
+        'updated_at',
+        'deleted_at'
     ];
 
     protected $dateFormat = 'Y-m-d H:i:s';
+
+    public function addresses()
+    {
+        return $this->hasMany(Address::class);
+    }
+
+    public function phones()
+    {
+        return $this->hasMany(Phone::class);
+    }
     
-    function typeUser()
-    {   }
 }

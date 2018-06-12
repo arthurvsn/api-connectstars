@@ -15,6 +15,7 @@ class CreateEventsTable extends Migration
     {
         Schema::create('events', function (Blueprint $table) {
             $table->increments('id');
+
             $table->string('name');
             $table->string('description', 200);
             $table->string('local');
@@ -22,10 +23,11 @@ class CreateEventsTable extends Migration
             $table->time('duration');
             $table->dateTime('event_date');
 
-            $table->integer('user_id')->unsigned();
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->integer('contractor_id')->unsigned();
+            $table->foreign('contractor_id')->references('id')->on('users');
             
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

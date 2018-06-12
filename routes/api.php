@@ -21,6 +21,7 @@ Route::post('/login', 'UserController@login');
 
 Route::group(['middleware' => 'jwt.auth'], function () {
     
+    Route::get('getAuthUser', 'UserController@getUserLogged');
     //routes of users
     Route::resource('user', 'UserController', ['except' => [
         'store', 'index'

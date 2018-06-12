@@ -14,13 +14,18 @@ class Event extends Model
         'ticket_price',
         'duration',
         'event_date',
-        'user_id',
+        'contractor_id',
     ];
 
-    public function getEventsWithIdUser($id)
+    /**
+     * Get event artistOnEvent id user
+     * @param $userId
+     * @return object
+     */
+    public function getEventsWithIdUser($userId)
     {
         $events = DB::table('events')
-            ->where('user_id', '=', $id)
+            ->where('contractor_id', '=', $userId)
             ->get();
         
         return $events;
