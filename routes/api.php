@@ -21,6 +21,8 @@ Route::post('/login', 'UserController@login');
 
 Route::group(['middleware' => 'jwt.auth'], function () {
     
+    Route::get('/ping', 'UserController@ping');
+
     Route::get('getAuthUser', 'UserController@getUserLogged');
     //routes of users
     Route::resource('user', 'UserController', ['except' => [

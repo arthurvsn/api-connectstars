@@ -41,13 +41,13 @@ class VerifyJWTToken
             if($e instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException) 
             {
                 $this->response->setType("N");
-                $this->response->setMessages("token_expired", $e->getStatusCode());
+                $this->response->setMessages("Token expired", $e->getStatusCode());
                 return response()->json($this->response->toString());
             }
             else if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException) 
             {
                 $this->response->setType("N");
-                $this->response->setMessages("token_invalid", $e->getStatusCode());
+                $this->response->setMessages("Token invalid", $e->getStatusCode());
                 return response()->json($this->response->toString());
             }
             else

@@ -42,14 +42,14 @@ class UserController extends Controller
            if (!$token = JWTAuth::attempt($credentials)) 
            {
                $this->response->setType("N");
-               $this->response->setMessages("invalid_username_or_password");
+               $this->response->setMessages("Invalid username or password");
                return response()->json($this->response->toString());
            }
         } 
         catch (JWTAuthException $e) 
         {
             $this->response->setType("N");
-            $this->response->setMessages("failed_to_create_token");
+            $this->response->setMessages("Failed to create token");
             return response()->json($this->response->toString(), 500);
         }
         
@@ -75,6 +75,27 @@ class UserController extends Controller
         $this->response->setType("S");
         $this->response->setDataSet("user", $users);
         $this->response->setMessages("Sucess!");
+
+        return response()->json($this->response->toString());
+    }
+
+    /**
+     * 
+     */
+    public function ping(Request $request) 
+    {
+        $user_logged = $this->eventService->getAuthUser($request);
+
+        if(!$user_logged) 
+        {
+            $this->response->setType("N");
+            $this->response->setMessages("Sucess!");
+        } 
+        else 
+        {
+            $this->response->setType("S");
+            $this->response->setMessages("Error!");
+        }
 
         return response()->json($this->response->toString());
     }
