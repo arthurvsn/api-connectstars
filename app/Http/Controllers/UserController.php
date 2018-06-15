@@ -203,11 +203,14 @@ class UserController extends Controller
                 return response()->json($this->response->toString(), 404);
             }
     
-            $user->fill($request->all());
+            $user->fill([
+                $request->all(),
+                'password' => bcrypt($request->get('password')),
+            ]);
             $user->save();
             $this->response->setType("S");
             $this->response->setDataSet("user", $user);
-            $this->response->setMessages("User on event updated successfully !");
+            $this->response->setMessages("User updated successfully !");
     
             return response()->json($this->response->toString());
         }
