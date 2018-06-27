@@ -21,6 +21,7 @@ class CreateAddressesTable extends Migration
             $table->string('state', 25)->nullable();
             $table->string('zip_code')->nullable();
             $table->string('country')->nullable();
+            $table->char('number')->nullable();
 
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users');

@@ -18,23 +18,11 @@ class Phone extends Model
         'deleted_at'
     ];
 
+    /**
+     * Table user relationship with phones
+     */
     public function users()
     {
-        return $this->belongsToMany(User::class);
-    }
-
-    /**
-     * Get number phones according id user
-     * @param int $userId
-     * @return object $phones
-     */
-    public function getPhoneUser($userId)
-    {
-        $phones = DB::table('phones')
-            ->select('country_code', 'number')
-            ->where('user_id', '=', $userId)
-            ->get();
-        
-        return $phones;
+        return $this->belongsTo('App\User');
     }
 }

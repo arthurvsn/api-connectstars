@@ -67,6 +67,7 @@ class UserService extends Service
                     'state'     => $value['state'],
                     'zip_code'  => $value['zip_code'],
                     'country'   => $value['country'],
+                    'number'    => $value['number'],
                     'user_id'   => $userId,
                 ]);
             }

@@ -274,7 +274,7 @@ class EventController extends Controller
             else
             {
                 //search a id where artist is on event
-                $artistOnEvents = $this->artistOnEvent->getArtistOnEvent($idEvent, $idArtist, $request->get('artist_confirmed'));
+                $artistOnEvents = $this->artistOnEvent->confirmArtistOnEvent($idEvent, $idArtist, $request->get('artist_confirmed'));
                 
                 if(!$artistOnEvents)
                 {

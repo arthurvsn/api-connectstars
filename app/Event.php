@@ -30,4 +30,12 @@ class Event extends Model
         
         return $events;
     }
+
+    /**
+     * Table artis_on_events relationship with event
+     */
+    public function artistOnEvents()
+    {
+        return $this->hasMany('App\ArtisOnEvent');
+    }
 }

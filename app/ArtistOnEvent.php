@@ -15,13 +15,29 @@ class ArtistOnEvent extends Model
     ];
 
     /**
+     * Table user relationship with artist_on_events
+     */
+    public function users()
+    {
+        return $this->belongsTo('App\User');
+    }
+
+    /**
+     * Table event relationship with artist_on_events
+     */
+    public function events()
+    {
+        return $this->belongsTo('App\Event');
+    }
+
+    /**
      * Get artist on Event
      * @param int $eventId
      * @param int $artistId
      * @param string $artist_confirmed
      * @return object $artistOnEvent
      */
-    public function getArtistOnEvent($eventId, $artistId, $artist_confirmed)
+    public function confirmArtistOnEvent($eventId, $artistId, $artist_confirmed)
     {
         $artistOnEvent = DB::table('artist_on_events')
             ->where([
