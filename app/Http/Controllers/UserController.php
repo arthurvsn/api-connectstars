@@ -246,6 +246,7 @@ class UserController extends Controller
             $user->cars()->delete();
             $user->addresses()->delete();
             $user->phones()->delete();
+            $user->artistOnEvents()->delete();
             $user->delete();
 
             $this->response->setType("S");

@@ -53,11 +53,19 @@ class User extends Authenticatable
     }
 
     /**
+     * Table events relationship with user
+     */
+    public function events()
+    {
+        return $this->hasMany('App\Event', 'contractor_id');
+    }
+
+    /**
      * Table artis_on_events relationship with user
      */
     public function artistOnEvents()
     {
-        return $this->hasMany('App\ArtisOnEvent');
+        return $this->hasMany('App\ArtisOnEvent', 'artist_id');
     }
     
 }

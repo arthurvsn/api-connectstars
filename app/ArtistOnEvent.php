@@ -15,11 +15,20 @@ class ArtistOnEvent extends Model
     ];
 
     /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'id'
+    ];
+
+    /**
      * Table user relationship with artist_on_events
      */
     public function users()
     {
-        return $this->belongsTo('App\User');
+        return $this->belongsTo('App\User', 'artist_id');
     }
 
     /**
@@ -42,7 +51,7 @@ class ArtistOnEvent extends Model
         $artistOnEvent = DB::table('artist_on_events')
             ->where([
                     ['event_id', $eventId],
-                    ['contractor_id', $artistId],
+                    ['artist_id', $artistId],
                 ])
             ->update(['artist_confirmed' => $artist_confirmed]);
 

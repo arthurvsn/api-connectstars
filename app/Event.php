@@ -7,6 +7,11 @@ use DB;
 
 class Event extends Model
 {
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */    
     protected $fillable = [
         'name',
         'description',
@@ -15,6 +20,17 @@ class Event extends Model
         'duration',
         'event_date',
         'contractor_id',
+    ];
+
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'contractor_id',
+        'updated_at',
+        'deleted_at'
     ];
 
     /**
@@ -29,6 +45,14 @@ class Event extends Model
             ->get();
         
         return $events;
+    }
+
+    /**
+     * Table event relationship with user
+     */
+    public function users()
+    {
+        return $this->hasMany('App\User');
     }
 
     /**
