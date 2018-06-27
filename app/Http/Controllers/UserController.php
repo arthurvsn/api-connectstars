@@ -228,7 +228,7 @@ class UserController extends Controller
     {
         try
         {
-            $user = User::find($id);
+            $user = $this->user->find($id);
 
             if(!$user) 
             {
@@ -243,7 +243,6 @@ class UserController extends Controller
              /**
              * Delete all dependencies of a user
              */
-            $user->cars()->delete();
             $user->addresses()->delete();
             $user->phones()->delete();
             $user->artistOnEvents()->delete();
@@ -261,7 +260,7 @@ class UserController extends Controller
 
             return response()->json($this->response->toString());
         }
-
+        
         \DB::commit();
         return response()->json($this->response->toString());
         

@@ -65,7 +65,7 @@ class User extends Authenticatable
      */
     public function artistOnEvents()
     {
-        return $this->hasMany('App\ArtisOnEvent', 'artist_id');
+        return $this->hasMany('App\ArtistOnEvent', 'artist_id');
     }
     
 }
