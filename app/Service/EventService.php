@@ -35,7 +35,7 @@ class EventService extends Service
                 'ticket_price'  => $request->get('ticket_price'),
                 'duration'      => $request->get('duration'),
                 'event_date'    => $request->get('event_date'),
-                'user_id'       => $userId,
+                'contractor_id' => $userId,
             ]);
             
             return $returnEvent;
@@ -66,7 +66,7 @@ class EventService extends Service
                     $returnAdd = $this->artistOnEvent->create([
                         'amount_artist_receive' => $value['amount_artist_receive'],
                         'artist_confirmed' => 'pending',
-                        'user_id' => $value['user_id'],
+                        'artist_id' => $value['artist_id'],
                         'event_id' => $eventId,
                     ]);
                 }

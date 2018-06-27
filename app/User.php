@@ -36,14 +36,36 @@ class User extends Authenticatable
 
     protected $dateFormat = 'Y-m-d H:i:s';
 
+    /**
+     * Table addresses relationship with user
+     */
     public function addresses()
     {
-        return $this->hasMany(Address::class);
+        return $this->hasMany('App\Address');
     }
 
+    /**
+     * Table phones relationship with user
+     */
     public function phones()
     {
-        return $this->hasMany(Phone::class);
+        return $this->hasMany('App\Phone');
+    }
+
+    /**
+     * Table events relationship with user
+     */
+    public function events()
+    {
+        return $this->hasMany('App\Event', 'contractor_id');
+    }
+
+    /**
+     * Table artis_on_events relationship with user
+     */
+    public function artistOnEvents()
+    {
+        return $this->hasMany('App\ArtistOnEvent', 'artist_id');
     }
     
 }

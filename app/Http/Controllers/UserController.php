@@ -19,7 +19,7 @@ class UserController extends Controller
     private $response;
     private $userService;
 
-    public function __construct(User $user) 
+    public function __construct() 
     {
         $this->user         = new User;
         $this->address      = new Address;
@@ -45,22 +45,24 @@ class UserController extends Controller
                $this->response->setMessages("Invalid username or password");
                return response()->json($this->response->toString());
            }
+
+           $user = JWTAuth::toUser($token);
+        
+            $this->response->setType("S");
+            $this->response->setMessages("Login successfully!");
+            $this->response->setDataSet("token", $token);
+           
+            $this->response->setDataSet("user", $user);
+
         } 
         catch (JWTAuthException $e) 
         {
             $this->response->setType("N");
             $this->response->setMessages("Failed to create token");
-            return response()->json($this->response->toString(), 500);
-        }
+            return response()->json($this->response->toString());
+        }    
         
-        $user = JWTAuth::toUser($token);
-        
-        $this->response->setType("S");
-        $this->response->setMessages("Login successfully!");
-        $this->response->setDataSet("token", $token);
-        
-        $this->response->setDataSet("user", $user);
-        return response()->json($this->response->toString(), 200);
+        return response()->json($this->response->toString());
     }
 
     /**
@@ -77,28 +79,7 @@ class UserController extends Controller
         $this->response->setMessages("Sucess!");
 
         return response()->json($this->response->toString());
-    }
-
-    /**
-     * 
-     */
-    public function ping(Request $request) 
-    {
-        $user_logged = $this->eventService->getAuthUser($request);
-
-        if(!$user_logged) 
-        {
-            $this->response->setType("N");
-            $this->response->setMessages("Sucess!");
-        } 
-        else 
-        {
-            $this->response->setType("S");
-            $this->response->setMessages("Error!");
-        }
-
-        return response()->json($this->response->toString());
-    }
+    }   
 
     /**
      * Show the form for creating a new resource.
@@ -135,7 +116,7 @@ class UserController extends Controller
             $this->response->setType("N");
             $this->response->setMessages($e->getMessage());
 
-            return response()->json($this->response->toString(), 500);
+            return response()->json($this->response->toString());
         }
 
         \DB::commit();
@@ -151,20 +132,18 @@ class UserController extends Controller
     public function show($id)
     {
         $user = $this->user->find($id);
-        $address = $this->address->getAddressUser($id);
-        $phone = $this->phone->getPhoneUser($id);
-
+        
         if(!$user)
         {
             $this->response->setType("N");
             $this->response->setMessages("User not found!");
-            return response()->json($this->response->toString(), 404);
+            return response()->json($this->response->toString());
         }
         else 
         {
-            $user->addresses = $address;
-            $user->phones = $phone;
-            
+            $user->addresses = $user->addresses()->get();
+            $user->phones = $user->phones()->get();
+
             $this->response->setType("S");
             $this->response->setDataSet("user", $user);
             $this->response->setMessages("Show user successfully!");
@@ -200,27 +179,43 @@ class UserController extends Controller
                 $this->response->setType("N");
                 $this->response->setMessages("Record not found!");
     
-                return response()->json($this->response->toString(), 404);
+                return response()->json($this->response->toString());
             }
     
+            /**
+             * Ainda é gambiarra, organizar isso
+             */
+            \DB::beginTransaction();            
             $user->fill([
                 $request->all(),
                 'password' => bcrypt($request->get('password')),
             ]);
             $user->save();
+            
+            $address = $request->get('addresses');
+            $phones = $request->get('phones');
+
+            $user->addresses()->update($address[0]);
+            $user->phones()->update($phones[0]);
+            /**
+             * Fim da Gambiarra
+             */
+
             $this->response->setType("S");
             $this->response->setDataSet("user", $user);
-            $this->response->setMessages("User updated successfully !");
-    
-            return response()->json($this->response->toString());
+            $this->response->setMessages("User updated successfully !");            
         }
         catch (\Exception $e)
         {
+            \DB::rollBack();
             $this->response->setType("N");
             $this->response->setMessages($e->getMessage());
-
-            return response()->json($this->response->toString(), 500);
+            
+            return response()->json($this->response->toString());
         }
+
+        \DB::commit();
+        return response()->json($this->response->toString());
     }
 
     /**
@@ -233,51 +228,41 @@ class UserController extends Controller
     {
         try
         {
-            $user = User::find($id);
+            $user = $this->user->find($id);
 
             if(!$user) 
             {
                 $this->response->setType("N");
                 $this->response->setMessages("Record not found!");
 
-                return response()->json($this->response->toString(), 404);
+                return response()->json($this->response->toString());
             }
 
+            \DB::beginTransaction();
+
+             /**
+             * Delete all dependencies of a user
+             */
+            $user->addresses()->delete();
+            $user->phones()->delete();
+            $user->artistOnEvents()->delete();
             $user->delete();
 
-        }
-        catch (\Exception $e)
-        {
-            $this->response->setType("N");
-            $this->response->setMessages($e->getMessage());
-
-            return response()->json($this->response->toString(), 500);
-        }
-        
-    }
-
-    /**
-     * 
-     */
-    public function getUserLogged(Request $resquest)
-    {
-        try
-        {
-            $user = $this->userService->getAuthUser($resquest);
-
             $this->response->setType("S");
-            $this->response->setMessages("Show user successfully!");
-            $this->response->setDataSet("user", $user);
+            $this->response->setMessages("User and your dependencies has been deleted");
 
         }
         catch (\Exception $e)
         {
+            \DB::rollBack();
             $this->response->setType("N");
             $this->response->setMessages($e->getMessage());
 
-            return response()->json($this->response->toString(), 500);
+            return response()->json($this->response->toString());
         }
         
+        \DB::commit();
         return response()->json($this->response->toString());
-    }
+        
+    }    
 }

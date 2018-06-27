@@ -13,6 +13,7 @@ class Address extends Model
         'state',
         'zip_code',
         'country',
+        'number',
         'user_id',
     ];
 
@@ -21,23 +22,11 @@ class Address extends Model
         'deleted_at'
     ];
 
+    /**
+     * Table user relationship with addresses
+     */
     public function users()
     {
-        return $this->belongsToMany(User::class);
-    }
-    
-    /**
-     * Get information address o user
-     * @param int $userId
-     * @return object $address
-     */
-    public function getAddressUser($userId)
-    {
-        $address = DB::table('addresses')
-            ->select('street', 'city', 'state', 'zip_code','country')
-            ->where('user_id', '=', $userId)
-            ->get();
-        
-        return $address;
+        return $this->belongsTo('App\User');
     }
 }
