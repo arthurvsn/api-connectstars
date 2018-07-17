@@ -19,6 +19,8 @@ Route::get('user', 'UserController@index');
 Route::post('register', 'UserController@store');
 Route::post('login', 'UserController@login');
 
+Route::get('teste', 'UserController@teste');
+
 Route::group(['middleware' => 'jwt.auth'], function () {
     
     Route::get('ping', 'HomeController@ping');

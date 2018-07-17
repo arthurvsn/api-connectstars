@@ -13,22 +13,24 @@ use \App\Service\EventService;
 
 class EventController extends Controller
 {
-    private $response;
-    private $event;
-    private $user;
-    private $eventService;
     private $artistOnEvent;
+    private $event;
+    private $eventService;
+    private $messages;
+    private $response;
+    private $user;
 
     /**
      * Contructor of controller
      */
     public function __construct() 
     {
-        $this->response = new Response();
-        $this->event = new Event();
-        $this->user = new User();
-        $this->eventService = new EventService();
-        $this->artistOnEvent = new ArtistOnEvent();
+        $this->artistOnEvent    = new ArtistOnEvent();
+        $this->event            = new Event();
+        $this->eventService     = new EventService();
+        $this->messages         = \Config::get('messages');
+        $this->response         = new Response();
+        $this->user             = new User();
     }
 
     /**
@@ -41,22 +43,15 @@ class EventController extends Controller
         $user_logged = $this->eventService->getAuthUser($request);
         
         if(!$user_logged || $user_logged->user_type == "ARTIST")
-        {
-            $this->response->setType("N");
-            $this->response->setMessages("Error on validate user");
-    
-            return response()->json($this->response->toString());
+        {    
+            return response()->json($this->response->toString(false, $this->messages['event']['validate_error']));
         }
 
         $user = $this->user->find($user_logged->id);
         $events = $user->events()->get();
-        //$events = $this->event->getEventsWithIdUser($user_logged->id);
-        
-        $this->response->setType("S");
-        $this->response->setMessages("Sucess");
-        $this->response->setDataSet("events", $events);
 
-        return response()->json($this->response->toString());
+        $this->response->setDataSet("events", $events);
+        return response()->json($this->response->toString(true, $this->messages['event']['show']));
     }
 
     /**
@@ -82,27 +77,18 @@ class EventController extends Controller
             if($user_logged->user_type == "CONTRACTOR")
             {
                 $returnEvent = $this->eventService->createEvent($request, $user_logged->id);
-        
-                $this->response->setType("S");
-                $this->response->setMessages("Event created");
-                $this->response->setDataSet("event", $returnEvent);
-        
-                return response()->json($this->response->toString());
+
+                $this->response->setDataSet("event", $returnEvent);        
+                return response()->json($this->response->toString(true, $this->messages['event']['save']));
             }
             else 
             {
-                $this->response->setType("N");
-                $this->response->setMessages("You don't have permission to create a event");
-    
-                return response()->json($this->response->toString());
+                return response()->json($this->response->toString(false, $this->messages['event']['permision']));
             }
         }
         catch(\Exception $e)
         {
-            $this->response->setType("N");
-            $this->response->setMessages($e->getMessage());
-
-            return response()->json($this->response->toString());
+            return response()->json($this->response->toString(false, $e->getMessage()));
         }
     }
 
@@ -118,17 +104,11 @@ class EventController extends Controller
 
         if(!$events)
         {
-            $this->response->setType("N");
-            $this->response->setMessages("Event not found");
-    
-            return response()->json($this->response->toString());
+            return response()->json($this->response->toString(false, $this->messages['error']));
         }
 
-        $this->response->setType("S");
-        $this->response->setMessages("Sucess!");
         $this->response->setDataSet("event", $events);
-    
-        return response()->json($this->response->toString());
+        return response()->json($this->response->toString(true, $this->messages['event']['save']));
     }
 
     /**
@@ -155,27 +135,18 @@ class EventController extends Controller
             
             if(!$events)
             {
-                $this->response->setType("N");
-                $this->response->setMessages("Event not found");
-        
-                return response()->json($this->response->toString());
+                return response()->json($this->response->toString(false, $this->messages['error']));
             }
     
             $events->fill($request->all());
             $events->save();
     
-            $this->response->setType("S");
             $this->response->setDataSet("event", $events);
-            $this->response->setMessages("Event updated successfully!");
-
-            return response()->json($this->response->toString());
+            return response()->json($this->response->toString(true, $this->messages['event']['save']));
         }
         catch (\Exception $e)
         {
-            $this->response->setType("N");
-            $this->response->setMessages($e->getMessage());
-
-            return response()->json($this->response->toString());
+            return response()->json($this->response->toString(false, $e->getMessage()));
         }
     }
 
@@ -192,20 +163,16 @@ class EventController extends Controller
             
             if(!$events)
             {
-                $this->response->setType("N");
-                $this->response->setMessages("Event not found!");
-    
-                return response()->json($this->response->toString());
+                return response()->json($this->response->toString(false, $this->messages['error']));
             }
     
             $events->delete();
+
+            return response()->json($this->response->toString(true, $this->messages['event']['delete']));
         }
         catch (\Exception $e)
         {
-            $this->response->setType("N");
-            $this->response->setMessages($e->getMessage());
-
-            return response()->json($this->response->toString());
+            return response()->json($this->response->toString(false, $e->getMessage()));
         }
     }
 
@@ -222,10 +189,7 @@ class EventController extends Controller
 
         if(!$events) 
         {
-            $this->response->setType("N");
-            $this->response->setMessages("Event not found");
-
-            return response()->json($this->response->toString());
+            return response()->json($this->response->toString(false, $this->messages['error']));
         }
         else
         {
@@ -233,33 +197,25 @@ class EventController extends Controller
             {
                 \DB::beginTransaction();
                 $addArtistToEvent = $this->eventService->addArtistOnEvent($idEvent, $request);
+
                 if($addArtistToEvent)
-                {                    
-                    $this->response->setType("S");
-                    $this->response->setMessages("Artist add a event!");
+                {
+                    \DB::commit();
+                    $this->response->setDataSet("Event", $addArtistToEvent);
+                    return response()->json($this->response->toString(true, $this->messages['event']['save']));
                 }
                 else
                 {
                     \DB::rollBack();
-                    $this->response->setType("N");
-                    $this->response->setMessages("Error on add artist on event!");
+                    return response()->json($this->response->toString(false, $this->messages['event']['error_add']));
                     
                 }
-                $this->response->setDataSet("Event", $addArtistToEvent);
-                
-                
             }
             catch(\Exception $e)
             {
                 \DB::rollBack();
-                $this->response->setType("N");
-                $this->response->setMessages($e->getMessage());
-
-                return response()->json($this->response->toString());
+                return response()->json($this->response->toString(false, $e->getMessage()));
             }
-
-            \DB::commit();
-            return response()->json($this->response->toString());
         }
     }
 
@@ -282,10 +238,7 @@ class EventController extends Controller
             
             if(!$events || !$artists || $artists->user_type != "ARTIST") 
             {
-                $this->response->setType("N");
-                $this->response->setMessages("Error on validate date!");
-    
-                return response()->json($this->response->toString());
+                return response()->json($this->response->toString(false, $this->messages['event']['error_data']));
             }
             else
             {
@@ -294,27 +247,18 @@ class EventController extends Controller
                 
                 if(!$artistOnEvents)
                 {
-                    $this->response->setType("N");
-                    $this->response->setMessages("Request to change a cofirmed artist not completed");
-    
-                    return response()->json($this->response->toString());
+                    return response()->json($this->response->toString(false, $this->messages['error_request']));
                 }
                 else 
                 {
-                    $this->response->setType("S");
-                    $this->response->setMessages("Artist changed your status on event");
-                    $this->response->setDataSet("Change Artist", $artistOnEvents);
-    
-                    return response()->json($this->response->toString());
+                    $this->response->setDataSet("ChangeArtist", $artistOnEvents);                    
+                    return response()->json($this->response->toString(true, $this->messages['event']['save']));
                 }
-            }            
+            }
         }
         catch (\Exception $e)
         {
-            $this->response->setType("N");
-            $this->response->setMessages($e->getMessage());
-
-            return response()->json($this->response->toString());
+            return response()->json($this->response->toString(false, $e->getMessage()));
         }
     }
 }

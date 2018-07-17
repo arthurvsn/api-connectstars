@@ -8,21 +8,20 @@ use \App\Service\UserService;
 
 class HomeController extends Controller
 {
+    private $messages;
     private $response;
     private $userService;
 
     public function __construct() 
     {
-        $this->response = new Response();
-        $this->userService = new UserService();
+        $this->messages     = \Config::get('messages');
+        $this->response     = new Response();
+        $this->userService  = new UserService();
     }
 
     public function index()
     {
-        $this->response->setMessages("API connected!");
-        $this->response->setType("S");
-
-        return response()->json($this->response->toString());
+        return response()->json($this->response->toString(true, $this->messages['api']['connect']));
     }
 
     /**
@@ -36,16 +35,13 @@ class HomeController extends Controller
 
         if(!$user_logged) 
         {
-            $this->response->setType("N");
-            $this->response->setMessages("Sucess!");
+            return response()->json($this->response->toString(true, $this->messages['api']['connect']));
         } 
         else 
         {
-            $this->response->setType("S");
-            $this->response->setMessages("Error!");
+            return response()->json($this->response->toString(true, $this->messages['api']['sucess']));
         }
 
-        return response()->json($this->response->toString());
     }
 
     /**
@@ -59,19 +55,12 @@ class HomeController extends Controller
         {
             $user = $this->userService->getAuthUser($resquest);
 
-            $this->response->setType("S");
-            $this->response->setMessages("Show user successfully!");
             $this->response->setDataSet("user", $user);
-
+            return response()->json($this->response->toString(true, $this->messages['user']['show']));
         }
         catch (\Exception $e)
         {
-            $this->response->setType("N");
-            $this->response->setMessages($e->getMessage());
-
-            return response()->json($this->response->toString(), 500);
-        }
-        
-        return response()->json($this->response->toString());
+            return response()->json($this->response->toString(false, $e->getMessage()));
+        }        
     }
 }
