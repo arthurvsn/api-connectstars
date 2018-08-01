@@ -30,6 +30,8 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::resource('user', 'UserController', ['except' => [
         'store', 'index'
     ]]);
+    Route::get('user/update-profile-picture/{user}', 'UserController@updateProfilePicture');
+
     
     //routes of events
     Route::resource('event', 'EventController');

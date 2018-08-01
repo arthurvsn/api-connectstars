@@ -27,14 +27,14 @@ class UserService extends Service
      * @param  \Illuminate\Http\Request  $request
      * @return object $user or false
      */
-    public function createUser(Request $request)
+    public function createUser(Request $request, $urlPicture)
     {  
         try
         {
             $returnUser = $this->user->create([
                 'name'              => $request->get('name'),
                 'username'          => $request->get('username'),
-                'profile_picture'   => $request->get('profile_picture'),
+                'profile_picture'   => $urlPicture,
                 'email'             => $request->get('email'),
                 'password'          => bcrypt($request->get('password')),
                 'user_type'         => $request->get('user_type'),

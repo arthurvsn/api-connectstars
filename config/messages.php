@@ -44,6 +44,7 @@ return [
 
     "user" => [
         "delete" => "User and your dependencies deletede sucessfully!",
+        "picture" => "Picture iserted",
         "save" => "Saved user successfully!",
         "show" => "Show user successfully",
     ],

@@ -10,10 +10,12 @@ use JWTAuth;
 use JWTAuthException;
 use \App\Response\Response;
 use \App\Service\UserService;
+use \App\Service\CloudinaryService;
 
 class UserController extends Controller
 {
     private $address;
+    private $cloudinary;
     private $messages;
     private $phone;
     private $response;
@@ -23,6 +25,7 @@ class UserController extends Controller
     public function __construct() 
     {
         $this->address      = new Address;
+        $this->cloudinary   = new CloudinaryService();
         $this->messages     = \Config::get('messages');
         $this->phone        = new Phone;
         $this->response     = new Response();
@@ -70,7 +73,7 @@ class UserController extends Controller
         $users = User::get();
 
         $this->response->setDataSet("user", $users);
-        return response()->json($this->response->toString(true, $this->messages['user']['create']));
+        return response()->json($this->response->toString(true, $this->messages['user']['show']));
     }
 
     /**
@@ -91,8 +94,16 @@ class UserController extends Controller
     {
         try
         {
+            $urlPicture = "no_file.png";
+
+            if($request->get('profile_picture'))
+            {
+                $picutre = $this->cloudinary->uploadFile($request);
+                $urlPicture = $picutre['url'];
+            }
+
             \DB::beginTransaction();
-            $returnUser = $this->userService->createUser($request);
+            $returnUser = $this->userService->createUser($request, $urlPicture);
 
             $returnUser->address = $this->userService->createAddressUser($returnUser->id, $request);
             $returnUser->phone = $this->userService->createPhoneUser($returnUser->id, $request);
@@ -226,6 +237,40 @@ class UserController extends Controller
         catch (\Exception $e)
         {
             \DB::rollBack();
+            return response()->json($this->response->toString(false, $e->getMessage()));
+        }
+    }
+
+    /**
+     * Update a profile picture to user 
+     * @param  int  $id
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function updateProfilePicture($id, Request $request)
+    {
+        try 
+        {
+            $picutre = $this->cloudinary->uploadFile($request);
+            $user = $this->user->find($id);
+
+            if (!$picutre || !$user)
+            {
+                return response()->json($this->response->toString(false, $this->messages['error']));
+            }
+
+            $user->fill([
+                'profile_picture' => $picutre['url'],
+            ]);
+
+            $user->save();
+
+            $this->response->setDataSet("picture", $picutre);
+            return response()->json($this->response->toString(true, $this->messages['user']['picture']));
+        }
+
+        catch (\Exception $e)
+        {
             return response()->json($this->response->toString(false, $e->getMessage()));
         }
     }
