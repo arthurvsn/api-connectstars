@@ -24,5 +24,16 @@ class Service
         }
         return $user;
     }
+
+    /**
+     * Method to search a user logged
+     * @return object $user
+     */
+    public function getAuthUserNoRequest()
+    {
+        $user = JWTAuth::toUser($_SERVER['HTTP_TOKEN']);
+        
+        return $user;
+    }
 }
 ?>

@@ -125,13 +125,14 @@ class UserController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Re  sponse
+     * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
         $user = $this->user->find($id);
+        $user_logged = $this->userService->getAuthUserNoRequest();
         
-        if(!$user)
+        if(!$user || $user_logged->id != $id)
         {
             return response()->json($this->response->toString(false, $this->messages['error']));
         }
