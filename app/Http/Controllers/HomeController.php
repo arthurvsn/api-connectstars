@@ -12,7 +12,7 @@ class HomeController extends Controller
     private $response;
     private $userService;
 
-    public function __construct() 
+    public function __construct()
     {
         $this->messages     = \Config::get('messages');
         $this->response     = new Response();
@@ -29,23 +29,22 @@ class HomeController extends Controller
      * @param \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function ping(Request $request) 
+    public function ping(Request $request)
     {
         $user_logged = $this->eventService->getAuthUser($request);
 
-        if(!$user_logged) 
+        if(!$user_logged)
         {
             return response()->json($this->response->toString(true, $this->messages['api']['connect']));
-        } 
-        else 
+        }
+        else
         {
             return response()->json($this->response->toString(true, $this->messages['api']['sucess']));
         }
-
     }
 
     /**
-     * Get user Logged on API 
+     * Get user Logged on API
      * @param \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
@@ -61,6 +60,6 @@ class HomeController extends Controller
         catch (\Exception $e)
         {
             return response()->json($this->response->toString(false, $e->getMessage()));
-        }        
+        }
     }
 }

@@ -129,22 +129,30 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        $user = $this->user->find($id);
-        $user_logged = $this->userService->getAuthUserNoRequest();
-        
-        if(!$user || $user_logged->id != $id)
+        try
+        {
+            $user = $this->user->find($id);
+            $user_logged = $this->userService->getAuthUserNoRequest();
+
+            if(!$user || $user_logged->id != $id)
+            {
+                return response()->json($this->response->toString(false, $this->messages['error']));
+            }
+            else
+            {
+                $user->addresses = $user->addresses()->get();
+                $user->phones = $user->phones()->get();
+
+                $this->response->setDataSet("user", $user);
+                
+                return response()->json($this->response->toString(true, $this->messages['user']['show']));
+            }
+        }
+        catch (\Exception $e)
         {
             return response()->json($this->response->toString(false, $this->messages['error']));
         }
-        else 
-        {
-            $user->addresses = $user->addresses()->get();
-            $user->phones = $user->phones()->get();
-
-            $this->response->setDataSet("user", $user);
-            
-            return response()->json($this->response->toString(true, $this->messages['user']['show']));
-        }
+        
     }
 
     /**
@@ -154,7 +162,7 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
-    {    }
+    {   }
 
     /**
      * Update the specified resource in storage.
@@ -168,22 +176,22 @@ class UserController extends Controller
         try
         {
             $user = User::find($id);
-            
-            if(!$user) 
-            {                
+
+            if(!$user)
+            {
                 return response()->json($this->response->toString(false, $this->messages['error']));
             }
-    
+
             /**
              * Ainda é gambiarra, organizar isso
              */
-            \DB::beginTransaction();            
+            \DB::beginTransaction();
             $user->fill([
                 $request->all(),
                 'password' => bcrypt($request->get('password')),
             ]);
             $user->save();
-            
+
             $address = $request->get('addresses');
             $phones = $request->get('phones');
 
@@ -194,7 +202,7 @@ class UserController extends Controller
              */
 
             $this->response->setDataSet("user", $user);
-            
+
             \DB::commit();
             return response()->json($this->response->toString(true, $this->messages['user']['save']));
         }
@@ -217,7 +225,7 @@ class UserController extends Controller
         {
             $user = $this->user->find($id);
 
-            if(!$user) 
+            if(!$user)
             {
                 return response()->json($this->response->toString(false, $this->messages['error']));
             }
@@ -250,7 +258,7 @@ class UserController extends Controller
      */
     public function updateProfilePicture($id, Request $request)
     {
-        try 
+        try
         {
             $picutre = $this->cloudinary->uploadFile($request);
             $user = $this->user->find($id);
@@ -269,7 +277,6 @@ class UserController extends Controller
             $this->response->setDataSet("picture", $picutre);
             return response()->json($this->response->toString(true, $this->messages['user']['picture']));
         }
-
         catch (\Exception $e)
         {
             return response()->json($this->response->toString(false, $e->getMessage()));

@@ -15,7 +15,7 @@ class UserService extends Service
     /**
      * Construct
      */
-    public function __construct() 
+    public function __construct()
     {
         $this->user     = new User();
         $this->address  = new Address();
@@ -28,7 +28,7 @@ class UserService extends Service
      * @return object $user or false
      */
     public function createUser(Request $request, $urlPicture)
-    {  
+    {
         try
         {
             $returnUser = $this->user->create([
@@ -44,7 +44,6 @@ class UserService extends Service
         {
             throw new Exception("Error to create a user", 0, $e);
         }
-
         return $returnUser;
     }
 
@@ -54,10 +53,10 @@ class UserService extends Service
      * @param  \Illuminate\Http\Request  $request
      * @return object
      */
-    public function createAddressUser($userId, Request $request) 
+    public function createAddressUser($userId, Request $request)
     {
         $returnAddressUser = [];
-        try 
+        try
         {
             foreach ($request->get('addresses') as $key => $value)
             {
@@ -89,7 +88,7 @@ class UserService extends Service
     public function createPhoneUser($userId, Request $request)
     {
         $returnPhoneUser = [];
-        try 
+        try
         {
             foreach ($request->get('phones') as $key => $value)
             {
