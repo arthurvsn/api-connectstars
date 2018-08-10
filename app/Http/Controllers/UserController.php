@@ -175,7 +175,7 @@ class UserController extends Controller
     {
         try
         {
-            $user = User::find($id);
+            $user = $this->user->find($id);
 
             if(!$user)
             {
