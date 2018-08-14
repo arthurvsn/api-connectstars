@@ -192,11 +192,17 @@ class UserController extends Controller
             ]);
             $user->save();
 
-            $address = $request->get('addresses');
+            $addresses = $request->get('addresses');
             $phones = $request->get('phones');
+            
+            foreach ($addresses as $address) {
+                $user->addresses()->update($address);    
+            }
 
-            $user->addresses()->update($address[0]);
-            $user->phones()->update($phones[0]);
+            foreach ($phones as $phone) {
+                $user->phones()->update($phone);    
+            }
+            
             /**
              * Fim da Gambiarra
              */
@@ -224,8 +230,9 @@ class UserController extends Controller
         try
         {
             $user = $this->user->find($id);
+            $user_logged = $this->userService->getAuthUserNoRequest();
 
-            if(!$user)
+            if(!$user || $user_logged->id != $id)
             {
                 return response()->json($this->response->toString(false, $this->messages['error']));
             }

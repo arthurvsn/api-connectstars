@@ -160,8 +160,9 @@ class EventController extends Controller
         try
         {
             $events = $this->event->find($id);
-            
-            if(!$events)
+            $user_logged = $this->userService->getAuthUserNoRequest();
+
+            if(!$events || $events->contractor_id != $user_logged->id)
             {
                 return response()->json($this->response->toString(false, $this->messages['error']));
             }
