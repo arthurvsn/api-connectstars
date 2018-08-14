@@ -132,9 +132,8 @@ class UserController extends Controller
         try
         {
             $user = $this->user->find($id);
-            $user_logged = $this->userService->getAuthUserNoRequest();
 
-            if(!$user || $user_logged->id != $id)
+            if(!$user)
             {
                 return response()->json($this->response->toString(false, $this->messages['error']));
             }
