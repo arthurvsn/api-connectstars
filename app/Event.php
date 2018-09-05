@@ -60,6 +60,6 @@ class Event extends Model
      */
     public function artistOnEvents()
     {
-        return $this->hasMany('App\ArtisOnEvent');
+        return $this->hasMany('App\ArtistOnEvent');
     }
 }

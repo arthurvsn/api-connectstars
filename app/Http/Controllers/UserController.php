@@ -10,21 +10,26 @@ use JWTAuth;
 use JWTAuthException;
 use \App\Response\Response;
 use \App\Service\UserService;
+use \App\Service\CloudinaryService;
 
 class UserController extends Controller
 {
-    private $user;
     private $address;
+    private $cloudinary;
+    private $messages;
     private $phone;
     private $response;
+    private $user;
     private $userService;
 
     public function __construct() 
     {
-        $this->user         = new User;
         $this->address      = new Address;
+        $this->cloudinary   = new CloudinaryService();
+        $this->messages     = \Config::get('messages');
         $this->phone        = new Phone;
         $this->response     = new Response();
+        $this->user         = new User;
         $this->userService  = new UserService();
     }
 
@@ -41,28 +46,21 @@ class UserController extends Controller
         {
            if (!$token = JWTAuth::attempt($credentials)) 
            {
-               $this->response->setType("N");
-               $this->response->setMessages("Invalid username or password");
-               return response()->json($this->response->toString());
+               return response()->json($this->response->toString(false, $this->messages['login']['credentials']));
            }
 
            $user = JWTAuth::toUser($token);
         
-            $this->response->setType("S");
-            $this->response->setMessages("Login successfully!");
-            $this->response->setDataSet("token", $token);
-           
+            $this->response->setDataSet("token", $token);           
             $this->response->setDataSet("user", $user);
+
+            return response()->json($this->response->toString(true, $this->messages['login']['sucess']));
 
         } 
         catch (JWTAuthException $e) 
         {
-            $this->response->setType("N");
-            $this->response->setMessages("Failed to create token");
-            return response()->json($this->response->toString());
-        }    
-        
-        return response()->json($this->response->toString());
+            return response()->json($this->response->toString(false, $e->getMessage()));
+        }
     }
 
     /**
@@ -73,13 +71,10 @@ class UserController extends Controller
     public function index()
     {
         $users = User::get();
-        
-        $this->response->setType("S");
-        $this->response->setDataSet("user", $users);
-        $this->response->setMessages("Sucess!");
 
-        return response()->json($this->response->toString());
-    }   
+        $this->response->setDataSet("user", $users);
+        return response()->json($this->response->toString(true, $this->messages['user']['show']));
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -99,57 +94,64 @@ class UserController extends Controller
     {
         try
         {
+            $urlPicture = "no_file.png";
+
+            if($request->get('profile_picture'))
+            {
+                $picutre = $this->cloudinary->uploadFile($request);
+                $urlPicture = $picutre['url'];
+            }
+
             \DB::beginTransaction();
-            $returnUser = $this->userService->createUser($request);
+            $returnUser = $this->userService->createUser($request, $urlPicture);
 
             $returnUser->address = $this->userService->createAddressUser($returnUser->id, $request);
             $returnUser->phone = $this->userService->createPhoneUser($returnUser->id, $request);
             
-            $this->response->setType("S");
             $this->response->setDataSet("user", $returnUser);            
-            $this->response->setMessages("Created user successfully!");
+            
+            \DB::commit();       
+            return response()->json($this->response->toString(true, $this->messages['user']['create']));
             
         }
         catch (\Exception $e)
         {
             \DB::rollBack();
-            $this->response->setType("N");
-            $this->response->setMessages($e->getMessage());
-
-            return response()->json($this->response->toString());
+            return response()->json($this->response->toString(false, $e->getMessage()));
         }
-
-        \DB::commit();
-        return response()->json($this->response->toString());
     }
 
     /**
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Re  sponse
+     * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
-        $user = $this->user->find($id);
-        
-        if(!$user)
+        try
         {
-            $this->response->setType("N");
-            $this->response->setMessages("User not found!");
-            return response()->json($this->response->toString());
-        }
-        else 
-        {
-            $user->addresses = $user->addresses()->get();
-            $user->phones = $user->phones()->get();
+            $user = $this->user->find($id);
 
-            $this->response->setType("S");
-            $this->response->setDataSet("user", $user);
-            $this->response->setMessages("Show user successfully!");
-            
-            return response()->json($this->response->toString());
+            if(!$user)
+            {
+                return response()->json($this->response->toString(false, $this->messages['error']));
+            }
+            else
+            {
+                $user->addresses = $user->addresses()->get();
+                $user->phones = $user->phones()->get();
+
+                $this->response->setDataSet("user", $user);
+                
+                return response()->json($this->response->toString(true, $this->messages['user']['show']));
+            }
         }
+        catch (\Exception $e)
+        {
+            return response()->json($this->response->toString(false, $this->messages['error']));
+        }
+        
     }
 
     /**
@@ -159,7 +161,7 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
-    {    }
+    {   }
 
     /**
      * Update the specified resource in storage.
@@ -172,50 +174,48 @@ class UserController extends Controller
     {
         try
         {
-            $user = User::find($id);
-            
-            if(!$user) 
+            $user = $this->user->find($id);
+
+            if(!$user)
             {
-                $this->response->setType("N");
-                $this->response->setMessages("Record not found!");
-    
-                return response()->json($this->response->toString());
+                return response()->json($this->response->toString(false, $this->messages['error']));
             }
-    
+
             /**
              * Ainda é gambiarra, organizar isso
              */
-            \DB::beginTransaction();            
+            \DB::beginTransaction();
             $user->fill([
                 $request->all(),
                 'password' => bcrypt($request->get('password')),
             ]);
             $user->save();
-            
-            $address = $request->get('addresses');
-            $phones = $request->get('phones');
 
-            $user->addresses()->update($address[0]);
-            $user->phones()->update($phones[0]);
+            $addresses = $request->get('addresses');
+            $phones = $request->get('phones');
+            
+            foreach ($addresses as $address) {
+                $user->addresses()->update($address);    
+            }
+
+            foreach ($phones as $phone) {
+                $user->phones()->update($phone);    
+            }
+            
             /**
              * Fim da Gambiarra
              */
 
-            $this->response->setType("S");
             $this->response->setDataSet("user", $user);
-            $this->response->setMessages("User updated successfully !");            
+
+            \DB::commit();
+            return response()->json($this->response->toString(true, $this->messages['user']['save']));
         }
         catch (\Exception $e)
         {
             \DB::rollBack();
-            $this->response->setType("N");
-            $this->response->setMessages($e->getMessage());
-            
-            return response()->json($this->response->toString());
+            return response()->json($this->response->toString(false, $e->getMessage()));
         }
-
-        \DB::commit();
-        return response()->json($this->response->toString());
     }
 
     /**
@@ -229,17 +229,14 @@ class UserController extends Controller
         try
         {
             $user = $this->user->find($id);
+            $user_logged = $this->userService->getAuthUserNoRequest();
 
-            if(!$user) 
+            if(!$user || $user_logged->id != $id)
             {
-                $this->response->setType("N");
-                $this->response->setMessages("Record not found!");
-
-                return response()->json($this->response->toString());
+                return response()->json($this->response->toString(false, $this->messages['error']));
             }
 
             \DB::beginTransaction();
-
              /**
              * Delete all dependencies of a user
              */
@@ -248,21 +245,52 @@ class UserController extends Controller
             $user->artistOnEvents()->delete();
             $user->delete();
 
-            $this->response->setType("S");
-            $this->response->setMessages("User and your dependencies has been deleted");
+            \DB::commit();
+            return response()->json($this->response->toString(true, $this->messages['user']['delete']));
 
         }
         catch (\Exception $e)
         {
             \DB::rollBack();
-            $this->response->setType("N");
-            $this->response->setMessages($e->getMessage());
-
-            return response()->json($this->response->toString());
+            return response()->json($this->response->toString(false, $e->getMessage()));
         }
-        
-        \DB::commit();
-        return response()->json($this->response->toString());
-        
-    }    
+    }
+
+    /**
+     * Update a profile picture to user 
+     * @param  int  $id
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function updateProfilePicture($id, Request $request)
+    {
+        try
+        {
+            $picutre = $this->cloudinary->uploadFile($request);
+            $user = $this->user->find($id);
+
+            if (!$picutre || !$user)
+            {
+                return response()->json($this->response->toString(false, $this->messages['error']));
+            }
+
+            $user->fill([
+                'profile_picture' => $picutre['url'],
+            ]);
+
+            $user->save();
+
+            $this->response->setDataSet("picture", $picutre);
+            return response()->json($this->response->toString(true, $this->messages['user']['picture']));
+        }
+        catch (\Exception $e)
+        {
+            return response()->json($this->response->toString(false, $e->getMessage()));
+        }
+    }
+
+    public function teste()
+    {
+        return response()->json($this->response->toString(true, $this->messages['user']['delete']));
+    }
 }

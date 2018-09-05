@@ -14,15 +14,40 @@ class Service
      */
     public function getAuthUser(Request $request)
     {
-        if (isset($_SERVER['HTTP_TOKEN']))
+        try
+        {
+            if (isset($_SERVER['HTTP_TOKEN']))
+            {
+                $user = JWTAuth::toUser($_SERVER['HTTP_TOKEN']);
+            }
+            else 
+            {
+                $user = JWTAuth::toUser($request->token);
+            }
+            
+            return $user;            
+        }
+        catch (\Exception $e)
+        {
+            throw new Exception("Error to validate a user", 0, $e);
+        }
+    }
+
+    /**
+     * Method to search a user logged
+     * @return object $user
+     */
+    public function getAuthUserNoRequest()
+    {
+        try
         {
             $user = JWTAuth::toUser($_SERVER['HTTP_TOKEN']);
+            return $user;
         }
-        else 
+        catch (\Exception $e)
         {
-            $user = JWTAuth::toUser($request->token);
+            throw new Exception("Error to validate a user", 0, $e);
         }
-        return $user;
     }
 }
 ?>

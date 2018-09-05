@@ -8,8 +8,8 @@ class Response
     private $type;
     private $dataSet;
 
-    public function __construct() 
-    {  
+    public function __construct()
+    {
         $this->dataSet = [];
     }
 
@@ -67,17 +67,17 @@ class Response
     {
         return $this->type;
     }
-    
+
      /**
      * Function to converte a object with options
      * @return object $data
      */
-    public function toString()
-    {   
-        $data = [];    
+    public function toString2()
+    {
+        $data = [];
         $data['message']['text'] = $this->getMessages();
         $data['message']['type'] = $this->getType();
-        
+
         $dataset = $this->getDataset();
         if (count($dataset) > 0 )
         {
@@ -85,9 +85,42 @@ class Response
             {
                 $data['dataset'][$key] = $value;
             }
-        }       
-        
-        return $data;        
+        }
+        return $data;
+    }
+
+    /**
+     * Function to converte a object with options
+     * @return object $data
+     */
+    public function toString($type, $message = "")
+    {
+        $data = [];
+
+        if($message == "")
+        {
+            if($type)
+            {
+                $message = "Successful request";
+            }
+            else
+            {
+                $message = "Error, could not complete your request";
+            }
+        }
+
+        $data['message']['text'] = $message;
+        $data['message']['type'] = $type;
+
+        $dataset = $this->getDataset();
+        if (count($dataset) > 0 )
+        {
+            foreach ($dataset as $key => $value)
+            {
+                $data['dataset'][$key] = $value;
+            }
+        }        
+        return $data;
     }
 }
 ?>

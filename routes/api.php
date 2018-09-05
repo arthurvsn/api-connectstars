@@ -19,6 +19,8 @@ Route::get('user', 'UserController@index');
 Route::post('register', 'UserController@store');
 Route::post('login', 'UserController@login');
 
+Route::get('teste', 'UserController@teste');
+
 Route::group(['middleware' => 'jwt.auth'], function () {
     
     Route::get('ping', 'HomeController@ping');
@@ -28,6 +30,8 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::resource('user', 'UserController', ['except' => [
         'store', 'index'
     ]]);
+    Route::post('user/update-profile-picture/{user}', 'UserController@updateProfilePicture');
+
     
     //routes of events
     Route::resource('event', 'EventController');
