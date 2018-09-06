@@ -15,9 +15,8 @@ use Illuminate\Http\Request;
 
 Route::get('/', 'HomeController@index');
 
-Route::get('user', 'UserController@index');
+Route::post('login', 'HomeController@login');
 Route::post('register', 'UserController@store');
-Route::post('login', 'UserController@login');
 
 Route::get('teste', 'UserController@teste');
 
@@ -32,7 +31,6 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     ]]);
     Route::post('user/update-profile-picture/{user}', 'UserController@updateProfilePicture');
 
-    
     //routes of events
     Route::resource('event', 'EventController');
     Route::post('add-artist/event/{event}', 'EventController@addArtistToEvent');

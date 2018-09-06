@@ -34,36 +34,6 @@ class UserController extends Controller
     }
 
     /**
-     * Login user
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function login(Request $request)
-    {
-        $credentials = $request->only('username', 'password');
-        $token = null;
-        try 
-        {
-           if (!$token = JWTAuth::attempt($credentials)) 
-           {
-               return response()->json($this->response->toString(false, $this->messages['login']['credentials']));
-           }
-
-           $user = JWTAuth::toUser($token);
-        
-            $this->response->setDataSet("token", $token);           
-            $this->response->setDataSet("user", $user);
-
-            return response()->json($this->response->toString(true, $this->messages['login']['sucess']));
-
-        } 
-        catch (JWTAuthException $e) 
-        {
-            return response()->json($this->response->toString(false, $e->getMessage()));
-        }
-    }
-
-    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
