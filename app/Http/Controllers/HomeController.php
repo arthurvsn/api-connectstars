@@ -44,6 +44,35 @@ class HomeController extends Controller
     }
 
     /**
+     * API Verify User
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function verifyUser($verification_code)
+    {
+        $check = DB::table('user_verifications')->where('token', $verification_code)->first();
+
+        if (!is_null($check))
+        {
+            $user = User::find($check->user_id);
+
+            if ($user->is_verified == 1)
+            {
+                return response()->json($this->response->toString(true, $this->messages['login']['verified']));
+            }
+
+            $user->update(['is_verified' => 1]);
+
+            DB::table('user_verifications')->where('token', $verification_code)->delete();
+
+            return response()->json($this->response->toString(true, $this->messages['login']['verified_true']));
+        }
+        
+        return response()->json($this->response->toString(false, $this->messages['login']['error']));
+    }
+
+    /**
      * Login user
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
@@ -54,13 +83,18 @@ class HomeController extends Controller
         $token = null;
         try 
         {
-           if (!$token = JWTAuth::attempt($credentials)) 
-           {
-               return response()->json($this->response->toString(false, $this->messages['login']['credentials']));
-           }
+            if (!$token = JWTAuth::attempt($credentials)) 
+            {
+                return response()->json($this->response->toString(false, $this->messages['login']['credentials']));
+            }
 
-           $user = JWTAuth::toUser($token);
-        
+            $user = JWTAuth::toUser($token);
+
+            if ($user->is_verified == 0)
+            {
+                return response()->json($this->response->toString(false, $this->messages['login']['not_verified']));
+            }
+
             $this->response->setDataSet("token", $token);           
             $this->response->setDataSet("user", $user);
 
