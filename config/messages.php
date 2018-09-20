@@ -34,6 +34,10 @@ return [
     "login" => [
         "credentials" => "Invalid username or password",
         "sucess" => "Login successfully!",
+        "not_verified" => "User not verified",
+        "verified" => "Account already verified...",
+        "verified_true" => "You have successfully verified your email address..",
+        "error" => "Verification code is invalid."
     ],
 
     "token" => [

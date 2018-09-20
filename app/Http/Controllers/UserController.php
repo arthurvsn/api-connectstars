@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Validator, DB, Hash, Mail;
 use App\User;
 use App\Address;
 use App\Phone;
@@ -64,7 +65,7 @@ class UserController extends Controller
     {
         try
         {
-            $urlPicture = "no_file.png";
+            $urlPicture = "https://material.angular.io/assets/img/examples/shiba1.jpg";
 
             if($request->get('profile_picture'))
             {
@@ -72,21 +73,40 @@ class UserController extends Controller
                 $urlPicture = $picutre['url'];
             }
 
-            \DB::beginTransaction();
+            DB::beginTransaction();
             $returnUser = $this->userService->createUser($request, $urlPicture);
 
             $returnUser->address = $this->userService->createAddressUser($returnUser->id, $request);
             $returnUser->phone = $this->userService->createPhoneUser($returnUser->id, $request);
             
-            $this->response->setDataSet("user", $returnUser);            
+            $name = $returnUser->name;
+            $email = $returnUser->email;
+            $urlFront = getenv('FRONT_URL') . "/confirm-verification";
             
-            \DB::commit();       
+            $verification_code = str_random(30);//Generate verification code
+
+            DB::table('user_verifications')->insert(['user_id' => $returnUser->id, 'token' => $verification_code]);
+
+            $subject = "Please verify your email address.";
+
+            Mail::send('email.verify', ['name' => $name, 'url' => $urlFront, 'verification_code' => $verification_code],
+                function($mail) use ($email, $name, $subject)
+                {
+                    $mail->from("noreplay@connectstars.com", "Connect Stars");
+                    $mail->to($email, $name);
+                    $mail->subject($subject);
+                }
+            );
+            
+            DB::commit();
+
+            $this->response->setDataSet("user", $returnUser);
             return response()->json($this->response->toString(true, $this->messages['user']['create']));
             
         }
         catch (\Exception $e)
         {
-            \DB::rollBack();
+            DB::rollBack();
             return response()->json($this->response->toString(false, $e->getMessage()));
         }
     }
@@ -154,7 +174,7 @@ class UserController extends Controller
             /**
              * Ainda é gambiarra, organizar isso
              */
-            \DB::beginTransaction();
+            DB::beginTransaction();
             $user->fill([
                 $request->all(),
                 'password' => bcrypt($request->get('password')),
@@ -178,12 +198,12 @@ class UserController extends Controller
 
             $this->response->setDataSet("user", $user);
 
-            \DB::commit();
+            DB::commit();
             return response()->json($this->response->toString(true, $this->messages['user']['save']));
         }
         catch (\Exception $e)
         {
-            \DB::rollBack();
+            DB::rollBack();
             return response()->json($this->response->toString(false, $e->getMessage()));
         }
     }
@@ -206,7 +226,7 @@ class UserController extends Controller
                 return response()->json($this->response->toString(false, $this->messages['error']));
             }
 
-            \DB::beginTransaction();
+            DB::beginTransaction();
              /**
              * Delete all dependencies of a user
              */
@@ -215,13 +235,13 @@ class UserController extends Controller
             $user->artistOnEvents()->delete();
             $user->delete();
 
-            \DB::commit();
+            DB::commit();
             return response()->json($this->response->toString(true, $this->messages['user']['delete']));
 
         }
         catch (\Exception $e)
         {
-            \DB::rollBack();
+            DB::rollBack();
             return response()->json($this->response->toString(false, $e->getMessage()));
         }
     }

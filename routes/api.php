@@ -19,6 +19,7 @@ Route::post('login', 'HomeController@login');
 Route::post('register', 'UserController@store');
 
 Route::get('teste', 'UserController@teste');
+Route::post('confirm-verification/verification_code', 'HomeController@verifyUser');
 
 Route::group(['middleware' => 'jwt.auth'], function () {
     
