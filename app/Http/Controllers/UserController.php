@@ -65,7 +65,7 @@ class UserController extends Controller
     {
         try
         {
-            $urlPicture = "no_file.png";
+            $urlPicture = "https://material.angular.io/assets/img/examples/shiba1.jpg";
 
             if($request->get('profile_picture'))
             {
@@ -82,7 +82,7 @@ class UserController extends Controller
             $name = $returnUser->name;
             $email = $returnUser->email;
             $urlFront = getenv('FRONT_URL') . "/confirm-verification";
-
+            
             $verification_code = str_random(30);//Generate verification code
 
             DB::table('user_verifications')->insert(['user_id' => $returnUser->id, 'token' => $verification_code]);
@@ -98,8 +98,8 @@ class UserController extends Controller
                 }
             );
             
-            DB::rollback();
-            print_r(__LINE__); die();
+            DB::commit();
+
             $this->response->setDataSet("user", $returnUser);
             return response()->json($this->response->toString(true, $this->messages['user']['create']));
             
