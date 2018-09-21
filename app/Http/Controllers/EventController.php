@@ -262,4 +262,27 @@ class EventController extends Controller
             return response()->json($this->response->toString(false, $e->getMessage()));
         }
     }
+
+    /**
+     * Method to search a events to contractor
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function eventContractor(Request $request)
+    {
+        $contractor = $this->eventService->getAuthUser($request);
+
+        if (!$contractor || $artists->user_type != "CONTRACTOR")
+        {
+            return response()->json($this->response->toString(false, $this->messages['event']['error_data']));
+        }
+
+        $users = $this->user->find($contractor->id);
+
+        $events = $users->events()->get();
+
+        $this->response->setDataSet('events', $events);
+        
+        return response()->json($this->response->toString(true, $this->messages['event']['show']));
+    }
 }
