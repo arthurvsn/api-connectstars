@@ -33,8 +33,8 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::post('user/update-profile-picture/{user}', 'UserController@updateProfilePicture');
 
     //routes of events
+    Route::get('event/user', 'EventController@eventUser');
     Route::resource('event', 'EventController');
-    Route::get('event/contractor', 'EventController@eventContractor');
     Route::post('add-artist/event/{event}', 'EventController@addArtistToEvent');
     Route::post('confirm-artist/event/{event}', 'EventController@confirmArtistToEvent');
 });

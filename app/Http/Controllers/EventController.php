@@ -42,7 +42,7 @@ class EventController extends Controller
     {   
         $user_logged = $this->eventService->getAuthUser($request);
         
-        if(!$user_logged || $user_logged->user_type == "ARTIST")
+        if (!$user_logged || $user_logged->user_type == "ARTIST")
         {    
             return response()->json($this->response->toString(false, $this->messages['event']['validate_error']));
         }
@@ -74,7 +74,7 @@ class EventController extends Controller
         {
             $user_logged = $this->eventService->getAuthUser($request);
     
-            if($user_logged->user_type == "CONTRACTOR")
+            if ($user_logged->user_type == "CONTRACTOR")
             {
                 $returnEvent = $this->eventService->createEvent($request, $user_logged->id);
 
@@ -102,7 +102,7 @@ class EventController extends Controller
     {
         $events = $this->event->find($id);
 
-        if(!$events)
+        if (!$events)
         {
             return response()->json($this->response->toString(false, $this->messages['error']));
         }
@@ -133,7 +133,7 @@ class EventController extends Controller
         {
             $events = $this->event->find($id);
             
-            if(!$events)
+            if (!$events)
             {
                 return response()->json($this->response->toString(false, $this->messages['error']));
             }
@@ -162,7 +162,7 @@ class EventController extends Controller
             $events = $this->event->find($id);
             $user_logged = $this->userService->getAuthUserNoRequest();
 
-            if(!$events || $events->contractor_id != $user_logged->id)
+            if (!$events || $events->contractor_id != $user_logged->id)
             {
                 return response()->json($this->response->toString(false, $this->messages['error']));
             }
@@ -188,7 +188,7 @@ class EventController extends Controller
         
         $events = $this->event->find($idEvent);
 
-        if(!$events) 
+        if (!$events) 
         {
             return response()->json($this->response->toString(false, $this->messages['error']));
         }
@@ -199,7 +199,7 @@ class EventController extends Controller
                 \DB::beginTransaction();
                 $addArtistToEvent = $this->eventService->addArtistOnEvent($idEvent, $request);
 
-                if($addArtistToEvent)
+                if ($addArtistToEvent)
                 {
                     \DB::commit();
                     $this->response->setDataSet("Event", $addArtistToEvent);
@@ -237,7 +237,7 @@ class EventController extends Controller
             //search Artist
             $artists = $this->eventService->getAuthUser($request);
             
-            if(!$events || !$artists || $artists->user_type != "ARTIST") 
+            if (!$events || !$artists || $artists->user_type != "ARTIST") 
             {
                 return response()->json($this->response->toString(false, $this->messages['event']['error_data']));
             }
@@ -246,7 +246,7 @@ class EventController extends Controller
                 //search a id where artist is on event
                 $artistOnEvents = $this->artistOnEvent->confirmArtistOnEvent($idEvent, $artists->id, $request->get('artist_confirmed'));
                 
-                if(!$artistOnEvents)
+                if (!$artistOnEvents)
                 {
                     return response()->json($this->response->toString(false, $this->messages['error_request']));
                 }
@@ -268,21 +268,39 @@ class EventController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function eventContractor(Request $request)
+    public function eventUser(Request $request)
     {
-        $contractor = $this->eventService->getAuthUser($request);
-
-        if (!$contractor || $artists->user_type != "CONTRACTOR")
+        try
         {
-            return response()->json($this->response->toString(false, $this->messages['event']['error_data']));
+            $userLooged = $this->eventService->getAuthUser($request);
+
+            if (!$userLooged)
+            {
+                return response()->json($this->response->toString(false, $this->messages['error_data']));
+            }
+            else if ($userLooged->user_type == "CONTRACTOR")
+            {
+                $users = $this->user->find($userLooged->id);
+
+                $events = $users->events()->get();
+
+                $this->response->setDataSet('events', $events);
+
+                return response()->json($this->response->toString(true, $this->messages['event']['show']));
+            }
+            else if ($userLooged->user_type == "ARTIST")
+            {
+                $eventsArtist = $this->event->getEventArtist($userLooged->id);
+
+                $this->response->setDataSet('events', $eventsArtist);
+
+                return response()->json($this->response->toString(true, $this->messages['event']['show']));
+            }
         }
-
-        $users = $this->user->find($contractor->id);
-
-        $events = $users->events()->get();
-
-        $this->response->setDataSet('events', $events);
+        catch (\Exception $e)
+        {
+            return response()->json($this->response->toString(false, $e->getMessage()));
+        }
         
-        return response()->json($this->response->toString(true, $this->messages['event']['show']));
     }
 }

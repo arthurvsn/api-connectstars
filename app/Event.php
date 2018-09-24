@@ -34,20 +34,6 @@ class Event extends Model
     ];
 
     /**
-     * Get event artistOnEvent id user
-     * @param $userId
-     * @return object
-     */
-    public function getEventsWithIdUser($userId)
-    {
-        $events = DB::table('events')
-            ->where('contractor_id', '=', $userId)
-            ->get();
-        
-        return $events;
-    }
-
-    /**
      * Table event relationship with user
      */
     public function users()
@@ -61,5 +47,34 @@ class Event extends Model
     public function artistOnEvents()
     {
         return $this->hasMany('App\ArtistOnEvent');
+    }
+
+    /**
+     * Get event artistOnEvent id user
+     * @param $userId
+     * @return object
+     */
+    public function getEventsWithIdUser($userId)
+    {
+        $events = DB::table('events')
+            ->where('contractor_id', '=', $userId)
+            ->get();
+
+        return $events;
+    }
+
+    /**
+     * 
+     */
+    public function getEventArtist($userID)
+    {
+        $events = DB::table('users')
+            ->select('events.*')
+            ->join('artist_on_events', 'users.id', '=', 'artist_on_events.artist_id')
+            ->join('events', 'artist_on_events.event_id', '=', 'events.id')
+            ->where('users.id', $userID)
+            ->get();
+
+        return $events;
     }
 }

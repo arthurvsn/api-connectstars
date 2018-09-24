@@ -23,6 +23,8 @@ return [
 
     "error_request" => "Error to complete request",
 
+    "error_dara" => "Error on validade",
+
     "event" => [
         "delete" => "Event and your dependencies deletede sucessfully!",
         "permission" => "You don't have permission to create a event",
