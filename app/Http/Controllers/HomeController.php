@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use JWTAuth;
+use JWTAuthException;
 use \App\Response\Response;
 use \App\Service\UserService;
 
