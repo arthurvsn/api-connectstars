@@ -10,7 +10,8 @@
         "laravel/framework": "5.4.*",
         "laravel/tinker": "~1.0",
         "nesbot/carbon": "^1.24",
-        "tymon/jwt-auth": "^0.5.12"
+        "tymon/jwt-auth": "^0.5.12",
+        "your-app-rocks/eloquent-uuid": "^1.2"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
