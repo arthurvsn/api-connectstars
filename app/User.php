@@ -4,10 +4,12 @@ namespace App;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use YourAppRocks\EloquentUuid\Traits\HasUuid;
 
 class User extends Authenticatable
 {
     use Notifiable;
+    use HasUuid;
 
     /**
      * The attributes that are mass assignable.
@@ -35,6 +37,11 @@ class User extends Authenticatable
     ];
 
     protected $dateFormat = 'Y-m-d H:i:s';
+
+    public function getUuidColumnName()
+    {
+        return 'id';
+    }
 
     /**
      * Table addresses relationship with user
