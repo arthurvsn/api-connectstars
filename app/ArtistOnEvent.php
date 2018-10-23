@@ -3,10 +3,14 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use YourAppRocks\EloquentUuid\Traits\HasUuid;
+
 use DB;
 
 class ArtistOnEvent extends Model
 {
+    use HasUuid;
+
     protected $fillable = [
         'amount_artist_receive',
         'artist_confirmed',
@@ -22,6 +26,14 @@ class ArtistOnEvent extends Model
     protected $hidden = [
         'id'
     ];
+
+    /**
+     * references to uuid
+     */
+    public function getUuidColumnName()
+    {
+        return 'id';
+    }
 
     /**
      * Table user relationship with artist_on_events

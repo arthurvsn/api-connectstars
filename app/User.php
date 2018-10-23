@@ -38,6 +38,9 @@ class User extends Authenticatable
 
     protected $dateFormat = 'Y-m-d H:i:s';
 
+    /**
+     * references to uuid
+     */
     public function getUuidColumnName()
     {
         return 'id';
