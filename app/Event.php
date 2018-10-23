@@ -3,10 +3,14 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use YourAppRocks\EloquentUuid\Traits\HasUuid;
+
 use DB;
 
 class Event extends Model
 {
+    use HasUuid;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -22,6 +26,14 @@ class Event extends Model
         'contractor_id',
     ];
 
+    /**
+     * references to uuid
+     */
+    public function getUuidColumnName()
+    {
+        return 'id';
+    }
+    
     /**
      * The attributes that should be hidden for arrays.
      *
