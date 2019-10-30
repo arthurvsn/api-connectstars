@@ -29,3 +29,5 @@ Tenha também o laravel a partir da versão 5.4.
 
 # Para saber as rotas da aplicação
 <pre>$ php artisan route:list</pre>
+
+Author: Arthur Vinicius & Denner Parreiras
